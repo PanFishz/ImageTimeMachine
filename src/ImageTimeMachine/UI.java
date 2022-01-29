@@ -5,18 +5,18 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
+import java.util.Stack;
 
 import static ImageTimeMachine.EditingTools.*;
 
 public class UI {
     private final JFrame frame = new JFrame("Image TiMeMaChInE - A Photo Editing Tool");
+    private static Stack<ImageTitlePair> stack = new Stack<ImageTitlePair>();
 
     private Label labelTitle = new Label("Image TiMeMaChInE - " +
             "send your photos to a different time");
@@ -39,7 +39,7 @@ public class UI {
     private Button button10 = new Button("Surprise Me!!");
     private Button button11 = new Button("To the Future!!");
     private Button button12 = new Button("To the Unknown!!");
-    //private Button button13 = new Button("Surprise Me!!");
+    private Button button13 = new Button("Back to last time period");
     private static int numOfEdits = 0;
 
 
@@ -53,6 +53,7 @@ public class UI {
     private static BufferedImage currentImage = null;
     private BufferedImage masterImage = null;
     private ImageServiceClient serviceConnection= null;
+    private ImageTitlePair imageTitlePair;
 
 
     public void initialize() throws IOException {
@@ -87,7 +88,7 @@ public class UI {
         button10.addActionListener(new CustomButtonClickHandler10());
         button11.addActionListener(new CustomButtonClickHandler11());
         button12.addActionListener(new CustomButtonClickHandler12());
-        //button11.addActionListener(new CustomButtonClickHandler10());
+        button13.addActionListener(new CustomButtonClickHandler13());
 
         buttonToSave.setForeground(new Color(126, 165, 242) );
         button9.setForeground(new Color(6, 155, 134) );
@@ -114,7 +115,7 @@ public class UI {
         contentPane.add(button10);
         contentPane.add(button11);
         contentPane.add(button12);
-        //contentPane.add(button10);
+        contentPane.add(button13);
         contentPane.add(preEditCanvas);
         contentPane.add(postEditCanvas);
         contentPane.add(homeCanvas);
@@ -232,6 +233,7 @@ public class UI {
                 10,
                 SpringLayout.SOUTH, button1);
 
+
         spring.putConstraint(SpringLayout.WEST, buttonToSave,
                 230, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, buttonToSave,
@@ -256,6 +258,12 @@ public class UI {
                 10,
                 SpringLayout.SOUTH, button2);
 
+        spring.putConstraint(SpringLayout.WEST, button13,
+                160, SpringLayout.WEST, button10);
+        spring.putConstraint(SpringLayout.NORTH, button13,
+                10,
+                SpringLayout.SOUTH, button2);
+
         frame.setVisible(true);
 
         BufferedImage og_image = null;
@@ -276,7 +284,7 @@ public class UI {
     }
 
     private void imageLoading() throws IOException {
-        if ( numOfEdits > 0) {
+        if ( numOfEdits > 0 || stack.size()>1) {
             if (warning() == 0) {
                 return;
             }
@@ -290,6 +298,12 @@ public class UI {
             try {
                 masterImage = ImageIO.read(new File(d));
                 currentImage = masterImage;
+
+                imageTitlePair = new ImageTitlePair(currentImage, "The Present");
+                stack = new Stack<>();
+                stack.push(imageTitlePair);
+
+
                 editImage = scale(masterImage, 450, 450);
             } catch (Exception ex) {
                 System.out.println("Error");
@@ -351,8 +365,23 @@ public class UI {
     public class CustomButtonClickHandler2 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String title = null;
+            try
+            {
+                title = getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             try{
                 currentImage = toGrayScale(currentImage);
+                imageTitlePair = new ImageTitlePair(currentImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 editImage = scale(currentImage, 450, 450);
                 postEditCanvas.setImage(editImage);
                 postEditCanvas.repaint();
@@ -363,13 +392,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            try
-            {
-                getService();
-            } catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
+
             numOfEdits++;
         }
     }
@@ -377,27 +400,33 @@ public class UI {
     public class CustomButtonClickHandler3 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String title = null;
+            try
+            {
+                title = getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             try{
                 BufferedImage sepia = toSepia(currentImage, 10);
                 currentImage = sepia;
+                imageTitlePair = new ImageTitlePair(currentImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 sepia = scale(sepia, 450, 450);
                 postEditCanvas.setImage(sepia);
                 postEditCanvas.repaint();
-                File outputfile = new File("saved.png");
-                ImageIO.write(sepia, "png", outputfile);
             }catch (Exception ex) {
 
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame, "Please upload your image!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            try
-            {
-                getService();
-            } catch (IOException ex)
-            {
-                ex.printStackTrace();
             }
             numOfEdits++;
         }
@@ -406,10 +435,25 @@ public class UI {
     public class CustomButtonClickHandler4 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String title = null;
+            try
+            {
+                title = getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             try{
                 editImage = toRed(currentImage);
                 editImage = toSepia(editImage, 10);
                 currentImage = editImage;
+                imageTitlePair = new ImageTitlePair(editImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 editImage = scale(editImage, 450, 450);
                 postEditCanvas.setImage(editImage);
                 postEditCanvas.repaint();
@@ -419,13 +463,6 @@ public class UI {
                 JOptionPane.showMessageDialog(frame, "Please upload your image!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            try
-            {
-                getService();
-            } catch (IOException ex)
-            {
-                ex.printStackTrace();
             }
             numOfEdits++;
         }
@@ -522,7 +559,7 @@ public class UI {
     public class CustomButtonClickHandler8 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if ( numOfEdits != 0) {
+            if ( numOfEdits > 0 || stack.size() > 1) {
                 if (warning() == 0) {
                     return;
                 }
@@ -573,9 +610,22 @@ public class UI {
         @Override
         public void actionPerformed(ActionEvent e) {
             try{
+                String title = null;
+                try {
+                    title = getService();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 currentImage = masterImage;
                 editImage = toRed(currentImage);
                 currentImage = editImage;
+                imageTitlePair = new ImageTitlePair(editImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 editImage = scale(editImage, 450, 450);
                 postEditCanvas.setImage(editImage);
                 postEditCanvas.repaint();
@@ -601,8 +651,21 @@ public class UI {
         @Override
         public void actionPerformed(ActionEvent e) {
             try{
+                String title = null;
+                try {
+                    title = getService();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 editImage = toNeon(currentImage);
                 currentImage = editImage;
+                imageTitlePair = new ImageTitlePair(editImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 editImage = scale(editImage, 450, 450);
                 postEditCanvas.setImage(editImage);
                 postEditCanvas.repaint();
@@ -612,13 +675,6 @@ public class UI {
                 JOptionPane.showMessageDialog(frame, "Please upload your image!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
-            }
-            try
-            {
-                getService();
-            } catch (IOException ex)
-            {
-                ex.printStackTrace();
             }
             numOfEdits++;
         }
@@ -627,9 +683,22 @@ public class UI {
     public class CustomButtonClickHandler12 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            String title = null;
+            try {
+                title = getService();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
             try{
                 editImage = toNegative(currentImage);
                 currentImage = editImage;
+                imageTitlePair = new ImageTitlePair(editImage, title);
+
+                if (stack.size() > 5) {
+                    stack.remove(0);
+                }
+                stack.push(imageTitlePair);
+
                 editImage = scale(editImage, 450, 450);
                 postEditCanvas.setImage(editImage);
                 postEditCanvas.repaint();
@@ -640,18 +709,45 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            try
-            {
-                getService();
-            } catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
             numOfEdits++;
         }
     }
+    public class CustomButtonClickHandler13 implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (stack.size()==1) {
+                JOptionPane.showMessageDialog(frame, "Can't go back anymore!",
+                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                //imageTitlePair = new ImageTitlePair(masterImage, "The Present");
+                //stack.push(imageTitlePair);
+                return;
+            }
+            else {
+                stack.pop();
+            }
+            currentImage = stack.peek().image;
+            editImage = scale(currentImage, 450, 450);
+            postEditCanvas.setImage(editImage);
+            postEditCanvas.repaint();
 
-    public void getService() throws IOException {
+            String result = stack.peek().title;
+            label6.setText("Traveled to: " + result);
+            label6.setVisible(true);
+
+        }
+    }
+    public class ImageTitlePair {
+        public BufferedImage image;
+        public String title;
+
+        public ImageTitlePair(BufferedImage image, String title) {
+            this.image = image;
+            this.title = title;
+        }
+
+    }
+
+    public String getService() throws IOException {
         //String[] searchTermList = {"unicorn","dogs_cats","programmer","ucla"};
         //String result = serviceConnection.sendMessage(searchTermList[(int) ((Math.random() * (4 - 1)) + 1)]);
         //String result = serviceConnection.sendMessage("smol_cat"); //jbhjbjbljk
@@ -660,8 +756,10 @@ public class UI {
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
                 "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
-        label6.setText("Traveled to: " + titleList[(int) ((Math.random() * (12 - 1)) + 1)]);
+        String result = titleList[(int) ((Math.random() * (12 - 1)) + 1)];
+        label6.setText("Traveled to: " + result);
         label6.setVisible(true);
+        return result;
     }
 
     public int warning() {
