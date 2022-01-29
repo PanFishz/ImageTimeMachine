@@ -29,7 +29,7 @@ public class UI {
 
     private Button button1 = new Button("select");
     private Button button2 = new Button("To the past");
-    private Button button3 = new Button("To the future");
+    private Button button3 = new Button("To the 1890");
     private Button button4 = new Button("To the dark age");
     private Button buttonToSave = new Button("Save Image");
     private Button button6 = new Button("Tutorial");
@@ -37,6 +37,9 @@ public class UI {
     private Button button8 = new Button("Back to the Present");
     private Button button9 = new Button("Advanced Options");
     private Button button10 = new Button("Surprise Me!!");
+    private Button button11 = new Button("To the Future!!");
+    private Button button12 = new Button("To the Unknown!!");
+    //private Button button13 = new Button("Surprise Me!!");
     private static int numOfEdits = 0;
 
 
@@ -49,9 +52,13 @@ public class UI {
     private BufferedImage editImage = null;
     private static BufferedImage currentImage = null;
     private BufferedImage masterImage = null;
+    private ImageServiceClient serviceConnection= null;
 
 
-    public void initialize() {
+    public void initialize() throws IOException {
+        //serviceConnection = new ImageServiceClient();
+        //serviceConnection.startConnection("127.0.0.1", 4444);
+
         frame.setSize(1000, 800);
         frame.setResizable(false);
         frame.setLocation(0, 0);
@@ -78,6 +85,9 @@ public class UI {
         button8.addActionListener(new CustomButtonClickHandler8());
         button9.addActionListener(new CustomButtonClickHandler9());
         button10.addActionListener(new CustomButtonClickHandler10());
+        button11.addActionListener(new CustomButtonClickHandler11());
+        button12.addActionListener(new CustomButtonClickHandler12());
+        //button11.addActionListener(new CustomButtonClickHandler10());
 
         buttonToSave.setForeground(new Color(126, 165, 242) );
         button9.setForeground(new Color(6, 155, 134) );
@@ -102,6 +112,9 @@ public class UI {
         contentPane.add(button8);
         contentPane.add(button9);
         contentPane.add(button10);
+        contentPane.add(button11);
+        contentPane.add(button12);
+        //contentPane.add(button10);
         contentPane.add(preEditCanvas);
         contentPane.add(postEditCanvas);
         contentPane.add(homeCanvas);
@@ -200,9 +213,22 @@ public class UI {
                 10,
                 SpringLayout.SOUTH, button1);
 
+
         spring.putConstraint(SpringLayout.WEST, button4,
-                465, SpringLayout.WEST, contentPane);
+                460, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button4,
+                10,
+                SpringLayout.SOUTH, button1);
+
+        spring.putConstraint(SpringLayout.WEST, button11,
+                600, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button11,
+                10,
+                SpringLayout.SOUTH, button1);
+
+        spring.putConstraint(SpringLayout.WEST, button12,
+                740, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button12,
                 10,
                 SpringLayout.SOUTH, button1);
 
@@ -257,10 +283,8 @@ public class UI {
         }
 
         fileDialog.setVisible(true);
-        if (fileDialog.getFile() == null) {
-            labelTitle.setText("You have not select");
-        } else
-        {
+        if (fileDialog.getFile() != null) {
+
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
 
             try {
@@ -339,7 +363,13 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            getService();
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             numOfEdits++;
         }
     }
@@ -362,7 +392,13 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            getService();
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             numOfEdits++;
         }
     }
@@ -384,7 +420,13 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            getService();
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             numOfEdits++;
         }
     }
@@ -395,7 +437,7 @@ public class UI {
             BufferedImage image = null;
             try
             {
-                image = ImageIO.read(new File("/Users/yushanmeyers/Documents/filter_tutorial.jpg"));
+                image = ImageIO.read(new File("/Users/yushanmeyers/Documents/filter_tutorial.png"));
             } catch (IOException ex)
             {
                 ex.printStackTrace();
@@ -413,7 +455,7 @@ public class UI {
             BufferedImage image = null;
             try
             {
-                image = ImageIO.read(new File("/Users/yushanmeyers/Documents/filter_example.jpg"));
+                image = ImageIO.read(new File("/Users/yushanmeyers/Documents/filter_example.png"));
             } catch (IOException ex)
             {
                 ex.printStackTrace();
@@ -492,8 +534,10 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            editImage = scale(masterImage, 450, 450);
             currentImage = masterImage;
+            editImage = currentImage;
+            editImage = scale(editImage, 450, 450);
+
             postEditCanvas.setImage(editImage);
             postEditCanvas.repaint();
             label6.setVisible(false);
@@ -542,12 +586,77 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            getService();
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
             numOfEdits++;
         }
     }
 
-    public void getService() {
+    public class CustomButtonClickHandler11 implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try{
+                editImage = toNeon(currentImage);
+                currentImage = editImage;
+                editImage = scale(editImage, 450, 450);
+                postEditCanvas.setImage(editImage);
+                postEditCanvas.repaint();
+            }catch (Exception ex) {
+
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Please upload your image!",
+                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+            numOfEdits++;
+        }
+    }
+
+    public class CustomButtonClickHandler12 implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try{
+                editImage = toNegative(currentImage);
+                currentImage = editImage;
+                editImage = scale(editImage, 450, 450);
+                postEditCanvas.setImage(editImage);
+                postEditCanvas.repaint();
+            }catch (Exception ex) {
+
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Please upload your image!",
+                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try
+            {
+                getService();
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+            numOfEdits++;
+        }
+    }
+
+    public void getService() throws IOException {
+        //String[] searchTermList = {"unicorn","dogs_cats","programmer","ucla"};
+        //String result = serviceConnection.sendMessage(searchTermList[(int) ((Math.random() * (4 - 1)) + 1)]);
+        //String result = serviceConnection.sendMessage("smol_cat"); //jbhjbjbljk
+        //System.out.println(result);
+        //label6.setText(result);
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
                 "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
