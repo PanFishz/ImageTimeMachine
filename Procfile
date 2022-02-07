@@ -1,0 +1,1 @@
+web: java -jar out/artifacts/socket_jar/socket.jar
