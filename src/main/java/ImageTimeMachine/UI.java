@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import static ImageTimeMachine.EditingControlPanel.*;
 
@@ -54,9 +55,13 @@ public class UI {
     private BufferedImage masterImage = null;
     private ImageServiceClient serviceConnection= null; //Todo
 
+
     public void initialize() throws IOException {
         serviceConnection = new ImageServiceClient(); //Todo
         serviceConnection.startConnection("127.0.0.1", 4444);
+
+        //OkHttp obj = new OkHttp();
+        //obj.sendGETSync();
 
         frame.setSize(1000, 800);
         frame.setResizable(false);
@@ -292,8 +297,9 @@ public class UI {
 
             preEditCanvas.setImage(editImage);
             preEditCanvas.repaint();
-
-            BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
+            //BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
+            URL url = new URL("http://abeautifulmess.com/wp-content/uploads/2021/07/dollhouse5.jpg");
+            BufferedImage blank_image = ImageIO.read(url);
 
             postEditCanvas.setImage(blank_image);
             postEditCanvas.repaint();
@@ -621,7 +627,14 @@ public class UI {
 
     public String getService() throws IOException {
 
-        String result = serviceConnection.sendMessage("cute cats"); //jbhjbjbljk //Todo
+        String result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
+        System.out.println(result);
+        result = serviceConnection.sendMessage("doll house");
+        System.out.println(result);
+        result = serviceConnection.sendMessage("bnjkbvhjkvjhk");
+        System.out.println(result);
+        result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
+        System.out.println(result);
 
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
