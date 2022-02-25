@@ -12,27 +12,29 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import static ImageTimeMachine.EditingControlPanel.*;
 
 public class UI {
     private final JFrame frame = new JFrame("Image TiMeMaChInE - A Photo Editing Tool");
     private static ImageStack stack = new ImageStack();
+    private String imageTitle = null;
 
     private Label label1_Title = new Label("Image TiMeMaChInE - " +
             "send your photos to a different time");
     private Label label2_Step1 = new Label("Step 1. Choose your image:     ");
     private Label label3_OGImage = new Label("Original photo");
-    private Label label4_Step2 = new Label("Step 2. Time Travel: ");
+    private Label label4_Step2 = new Label("Step 2. Time Travel ~(^.^)~: ");
     private Label label5_AFImage = new Label("Time-travelled photo");
-    private Label label6_ImageTitle = new Label("                                             ");
+    private Label label6_ImageTitle = new Label("                                                          ");
     private Label label7_Step3 = new Label("Step 3. Save your journey: ");
+    private Label label8_TranslatedTitle = new Label("                                                     ");
+    private JTextArea text1_Trivia = new JTextArea(3,40);
 
     private Button button1_Select = new Button("select");
-    private Button button2_ToPast = new Button("To the past");
-    private Button button3_To1890 = new Button("To the 1890");
-    private Button button4_ToDark = new Button("To the dark age");
+    private Button button2_ToDisPast = new Button("To the Distant Past");
+    private Button button3_ToPast = new Button("To the Past");
+    private Button button4_ToDark = new Button("To the Dark Ages");
     private Button button5_ToSave = new Button("Save Image");
     private Button button6_Tutorial = new Button("Tutorial");
     private Button button7_Examples = new Button("More Examples");
@@ -41,7 +43,8 @@ public class UI {
     private Button button10_SurpriseMe = new Button("Surprise Me!!");
     private Button button11_ToFuture = new Button("To the Future!!");
     private Button button12_ToUnknown = new Button("To the Unknown!!");
-    private Button button13_BackToLast = new Button("Back to last time period");
+    private Button button13_BackToLast = new Button("Back to the previous time period");
+    private Button button14_Translate = new Button("Trivia");
     private static int numOfEdits = 0;
 
     private ImageCanvas preEditCanvas;
@@ -60,9 +63,6 @@ public class UI {
         serviceConnection = new ImageServiceClient(); //Todo
         serviceConnection.startConnection("127.0.0.1", 4444);
 
-        //OkHttp obj = new OkHttp();
-        //obj.sendGETSync();
-
         frame.setSize(1000, 800);
         frame.setResizable(false);
         frame.setLocation(0, 0);
@@ -80,8 +80,8 @@ public class UI {
         homeCanvas.setSize(900, 450);
 
         button1_Select.addActionListener(new CustomButtonClickHandler1_SelectPhoto());
-        button2_ToPast.addActionListener(new CustomButtonClickHandler2_ToPast());
-        button3_To1890.addActionListener(new CustomButtonClickHandler3_To1890());
+        button2_ToDisPast.addActionListener(new CustomButtonClickHandler2_ToPast());
+        button3_ToPast.addActionListener(new CustomButtonClickHandler3_To1890());
         button4_ToDark.addActionListener(new CustomButtonClickHandler4_ToDark());
         button6_Tutorial.addActionListener(new CustomButtonClickHandler5_Tutorial());
         button7_Examples.addActionListener(new CustomButtonClickHandler6_Examples());
@@ -92,6 +92,8 @@ public class UI {
         button11_ToFuture.addActionListener(new CustomButtonClickHandler11_ToFuture());
         button12_ToUnknown.addActionListener(new CustomButtonClickHandler12_ToUnknown());
         button13_BackToLast.addActionListener(new CustomButtonClickHandler13_BackToLast());
+        button14_Translate.addActionListener(new CustomButtonClickHandler14_Trivia());
+
 
         button5_ToSave.setForeground(new Color(126, 165, 242) );
         button9_AdvanceOptions.setForeground(new Color(6, 155, 134) );
@@ -106,9 +108,10 @@ public class UI {
         contentPane.add(label5_AFImage);
         contentPane.add(label6_ImageTitle);
         contentPane.add(label7_Step3);
+        contentPane.add(label8_TranslatedTitle);
         contentPane.add(button1_Select);
-        contentPane.add(button2_ToPast);
-        contentPane.add(button3_To1890);
+        contentPane.add(button2_ToDisPast);
+        contentPane.add(button3_ToPast);
         contentPane.add(button4_ToDark);
         contentPane.add(button5_ToSave);
         contentPane.add(button6_Tutorial);
@@ -119,17 +122,24 @@ public class UI {
         contentPane.add(button11_ToFuture);
         contentPane.add(button12_ToUnknown);
         contentPane.add(button13_BackToLast);
+        contentPane.add(button14_Translate);
         contentPane.add(preEditCanvas);
         contentPane.add(postEditCanvas);
         contentPane.add(homeCanvas);
+        contentPane.add(text1_Trivia);
 
         label1_Title.setFont(new Font("Serif", Font.PLAIN, 25));
-        label3_OGImage.setFont(new Font("Serif", Font.PLAIN, 15));
+        label3_OGImage.setFont(new Font("Serif", Font.PLAIN, 10));
         label3_OGImage.setForeground(new Color(111, 122, 143));
-        label5_AFImage.setFont(new Font("Serif", Font.PLAIN, 15));
+        label5_AFImage.setFont(new Font("Serif", Font.PLAIN, 10));
         label5_AFImage.setForeground(new Color(111, 122, 143));
         label6_ImageTitle.setFont(new Font("Serif", Font.PLAIN, 18));
         label6_ImageTitle.setForeground(new Color(11, 122, 143));
+        label8_TranslatedTitle.setFont(new Font("Serif", Font.PLAIN, 18));
+        label8_TranslatedTitle.setForeground(new Color(11, 122, 143));
+        text1_Trivia.setOpaque(false);
+        text1_Trivia.setBackground(Color.lightGray);
+
 
 
         spring.putConstraint(SpringLayout.WEST, label1_Title,
@@ -165,88 +175,99 @@ public class UI {
         spring.putConstraint(SpringLayout.WEST, label3_OGImage,
                 50, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, label3_OGImage,
-                10, SpringLayout.SOUTH, preEditCanvas);
+                68, SpringLayout.NORTH, contentPane);
 
         spring.putConstraint(SpringLayout.WEST, label4_Step2,
                 50, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, label4_Step2,
-                20, SpringLayout.SOUTH, label2_Step1);
+                30, SpringLayout.SOUTH, label2_Step1);
 
         spring.putConstraint(SpringLayout.WEST, label7_Step3,
                 50, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, label7_Step3,
-                100, SpringLayout.SOUTH, label4_Step2);
+                60, SpringLayout.SOUTH, label4_Step2);
 
         spring.putConstraint(SpringLayout.WEST, label5_AFImage,
-                640, SpringLayout.EAST, label3_OGImage);
+                725, SpringLayout.EAST, label3_OGImage);
         spring.putConstraint(SpringLayout.NORTH, label5_AFImage,
-                10, SpringLayout.SOUTH, preEditCanvas);
+                68, SpringLayout.NORTH, contentPane);
 
         spring.putConstraint(SpringLayout.WEST, label6_ImageTitle,
-                500, SpringLayout.WEST, contentPane);
+                390, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, label6_ImageTitle,
                 7, SpringLayout.SOUTH, preEditCanvas);
+
+        spring.putConstraint(SpringLayout.WEST, text1_Trivia,
+                500, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, text1_Trivia,
+                7, SpringLayout.SOUTH, label6_ImageTitle);
 
         spring.putConstraint(SpringLayout.WEST, label2_Step1,
                 50, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, label2_Step1,
-                50, SpringLayout.SOUTH, preEditCanvas);
+                80, SpringLayout.SOUTH, preEditCanvas);
 
         spring.putConstraint(SpringLayout.WEST, button1_Select,
-                0, SpringLayout.EAST, label2_Step1);
+                240, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button1_Select,
-                45, SpringLayout.SOUTH, preEditCanvas);
+                76, SpringLayout.SOUTH, preEditCanvas);
 
-        spring.putConstraint(SpringLayout.WEST, button2_ToPast,
-                210, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button2_ToPast,
-                10, SpringLayout.SOUTH, button1_Select);
+        spring.putConstraint(SpringLayout.WEST, button2_ToDisPast,
+                240, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button2_ToDisPast,
+                15, SpringLayout.SOUTH, button1_Select);
 
-        spring.putConstraint(SpringLayout.WEST, button3_To1890,
-                330, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button3_To1890,
-                10, SpringLayout.SOUTH, button1_Select);
+        spring.putConstraint(SpringLayout.WEST, button3_ToPast,
+                405, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button3_ToPast,
+                15, SpringLayout.SOUTH, button1_Select);
 
         spring.putConstraint(SpringLayout.WEST, button4_ToDark,
-                460, SpringLayout.WEST, contentPane);
+                515, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button4_ToDark,
-                10, SpringLayout.SOUTH, button1_Select);
+                15, SpringLayout.SOUTH, button1_Select);
 
         spring.putConstraint(SpringLayout.WEST, button11_ToFuture,
-                600, SpringLayout.WEST, contentPane);
+                665, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button11_ToFuture,
-                10, SpringLayout.SOUTH, button1_Select);
+                15, SpringLayout.SOUTH, button1_Select);
 
         spring.putConstraint(SpringLayout.WEST, button12_ToUnknown,
-                740, SpringLayout.WEST, contentPane);
+                800, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button12_ToUnknown,
-                10, SpringLayout.SOUTH, button1_Select);
+                15, SpringLayout.SOUTH, button1_Select);
 
         spring.putConstraint(SpringLayout.WEST, button5_ToSave,
-                230, SpringLayout.WEST, contentPane);
+                240, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button5_ToSave,
-                95, SpringLayout.SOUTH, label4_Step2);
+                56, SpringLayout.SOUTH, label4_Step2);
 
         spring.putConstraint(SpringLayout.WEST, button8_BackPresent,
-                210, SpringLayout.WEST, contentPane);
+                240, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button8_BackPresent,
-                10, SpringLayout.SOUTH, button2_ToPast);
+                10, SpringLayout.SOUTH, button2_ToDisPast);
 
         spring.putConstraint(SpringLayout.WEST, button9_AdvanceOptions,
                 170, SpringLayout.WEST, button8_BackPresent);
         spring.putConstraint(SpringLayout.NORTH, button9_AdvanceOptions,
-                10, SpringLayout.SOUTH, button2_ToPast);
+                10, SpringLayout.SOUTH, button2_ToDisPast);
 
         spring.putConstraint(SpringLayout.WEST, button10_SurpriseMe,
-                160, SpringLayout.WEST, button9_AdvanceOptions);
+                170, SpringLayout.WEST, button9_AdvanceOptions);
         spring.putConstraint(SpringLayout.NORTH, button10_SurpriseMe,
-                10, SpringLayout.SOUTH, button2_ToPast);
+                10, SpringLayout.SOUTH, button2_ToDisPast);
 
         spring.putConstraint(SpringLayout.WEST, button13_BackToLast,
-                160, SpringLayout.WEST, button10_SurpriseMe);
+                130, SpringLayout.WEST, button10_SurpriseMe);
         spring.putConstraint(SpringLayout.NORTH, button13_BackToLast,
-                10, SpringLayout.SOUTH, button2_ToPast);
+                10, SpringLayout.SOUTH, button2_ToDisPast);
 
+        spring.putConstraint(SpringLayout.WEST, button14_Translate,
+                855, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button14_Translate,
+                5, SpringLayout.SOUTH, postEditCanvas);
+
+        button14_Translate.setVisible(false);
         frame.setVisible(true);
 
         BufferedImage homeImage = null;
@@ -265,13 +286,10 @@ public class UI {
     }
 
     private void imageLoading() throws IOException {
-        label6_ImageTitle.setVisible(true);
         if ( numOfEdits > 0 ) {
             if (warning() == 0) {
                 return;
             }
-        } else {
-            label6_ImageTitle.setVisible(false);
         }
 
         fileDialog.setVisible(true);
@@ -279,6 +297,8 @@ public class UI {
         if (fileDialog.getFile() != null) {
 
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
+            button14_Translate.setVisible(false);
+            label8_TranslatedTitle.setVisible(false);
 
             try {
                 masterImage = ImageIO.read(new File(d));
@@ -297,9 +317,9 @@ public class UI {
 
             preEditCanvas.setImage(editImage);
             preEditCanvas.repaint();
-            //BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
-            URL url = new URL("http://abeautifulmess.com/wp-content/uploads/2021/07/dollhouse5.jpg");
-            BufferedImage blank_image = ImageIO.read(url);
+            BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
+            //URL url = new URL("http://abeautifulmess.com/wp-content/uploads/2021/07/dollhouse5.jpg");
+            //BufferedImage blank_image = ImageIO.read(url);
 
             postEditCanvas.setImage(blank_image);
             postEditCanvas.repaint();
@@ -315,7 +335,6 @@ public class UI {
     public class CustomButtonClickHandler1_SelectPhoto implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            //label6_ImageTitle.setVisible(false);
             try{
                 imageLoading();
             } catch (Exception ex) {
@@ -329,15 +348,9 @@ public class UI {
     public class CustomButtonClickHandler2_ToPast implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String title = null;
-            try {
-                title = getService();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            label8_TranslatedTitle.setVisible(false);
             try {
                 currentImage = toGrayScale(currentImage);
-                stack.addToStack(currentImage, title);
                 displayImage();
             } catch (Exception ex) {
                 label6_ImageTitle.setVisible(false);
@@ -346,6 +359,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            addStackAndTitle();
             numOfEdits++;
         }
     }
@@ -353,15 +367,9 @@ public class UI {
     public class CustomButtonClickHandler3_To1890 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String title = null;
-            try {
-                title = getService();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            label8_TranslatedTitle.setVisible(false);
             try {
                 currentImage = toSepia(currentImage, 10);
-                stack.addToStack(currentImage, title);
                 displayImage();
             } catch (Exception ex) {
 
@@ -370,6 +378,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            addStackAndTitle();
             numOfEdits++;
         }
     }
@@ -377,17 +386,10 @@ public class UI {
     public class CustomButtonClickHandler4_ToDark implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String title = null;
+            label8_TranslatedTitle.setVisible(false);
             try {
-                title = getService();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            try {
-
                 currentImage = toBlue(currentImage);
                 currentImage = toSepia(currentImage, 10);
-                stack.addToStack(currentImage, title);
                 displayImage();
             } catch (Exception ex) {
 
@@ -396,6 +398,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            addStackAndTitle();
             numOfEdits++;
         }
     }
@@ -421,13 +424,13 @@ public class UI {
         public void actionPerformed(ActionEvent e) {
             BufferedImage image = null;
             try {
-                image = ImageIO.read(new File("/Users/yushanmeyers/Documents/filter_example.png"));
+                image = ImageIO.read(new File("filterExamples.png"));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
             JLabel picLabel = new JLabel(new ImageIcon(image));
             JOptionPane.showMessageDialog(null, picLabel,
-                    "Filters Examples", JOptionPane.PLAIN_MESSAGE, null);
+                    "Filter Examples", JOptionPane.PLAIN_MESSAGE, null);
         }
     }
 
@@ -455,9 +458,12 @@ public class UI {
                 FileNameExtensionFilter currentFilter = (FileNameExtensionFilter) savechooser.getFileFilter();
                 String ext = currentFilter.getExtensions()[0];
 
+                String fileName = file.getName() + "_" + stack.getStack().peek().getTitle();
+                file = new File(file.getParent(), fileName + "." + ext);
+
                 if (!currentFilter.accept(file)) {
-                    // File does not not have the correct extension, fix it
-                    String fileName = file.getName();
+                    // File does not have the correct extension, fix it
+                    fileName = file.getName();
                     file = new File(file.getParent(), fileName + "." + ext);
                 }
 
@@ -493,8 +499,9 @@ public class UI {
             }
             currentImage = masterImage;
             displayImage();
-            label6_ImageTitle.setText("Back to the Present");
+            label6_ImageTitle.setText("                  Back to the Present");
             label6_ImageTitle.setVisible(true);
+            label8_TranslatedTitle.setVisible(false);
             stack = new ImageStack();
             stack.addToStack(currentImage, "The Present");
 
@@ -505,6 +512,7 @@ public class UI {
     public class CustomButtonClickHandler9_AdvanceOptions implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+
             if(currentImage == null) {
                 JOptionPane.showMessageDialog(frame, "No image to crop, please upload an image!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
@@ -516,7 +524,9 @@ public class UI {
             }
             else {
                 currentImage = cropImage(anchor, currentImage);
-                stack.addToStack(currentImage, stack.getStack().peek().title);
+                String translation = stack.getStack().peek().getTranslation();
+                stack.addToStack(currentImage, stack.getStack().peek().getTitle());
+                stack.getStack().peek().setTrivia(translation);
                 displayImage();
                 numOfEdits++;
             }
@@ -526,16 +536,10 @@ public class UI {
     public class CustomButtonClickHandler10_SurpriseMe implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            label8_TranslatedTitle.setVisible(false);
             try{
-                String title = null;
-                try {
-                    title = getService();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
                 currentImage = masterImage;
                 currentImage = surpriseMe(currentImage);
-                stack.addToStack(currentImage, title);
                 displayImage();
             }catch (Exception ex) {
 
@@ -544,7 +548,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
+            addStackAndTitle();
             numOfEdits++;
         }
     }
@@ -552,15 +556,10 @@ public class UI {
     public class CustomButtonClickHandler11_ToFuture implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            label8_TranslatedTitle.setVisible(false);
+
             try{
-                String title = null;
-                try {
-                    title = getService();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
                 currentImage = toNeon(currentImage);
-                stack.addToStack(currentImage, title);
                 displayImage();
             }catch (Exception ex) {
 
@@ -569,6 +568,7 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            addStackAndTitle();
             numOfEdits++;
         }
     }
@@ -576,15 +576,9 @@ public class UI {
     public class CustomButtonClickHandler12_ToUnknown implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            String title = null;
-            try {
-                title = getService();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            label8_TranslatedTitle.setVisible(false);
             try{
                 currentImage = toNegative(currentImage);
-                stack.addToStack(currentImage, title);
                 displayImage();
             }catch (Exception ex) {
 
@@ -593,13 +587,19 @@ public class UI {
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            addStackAndTitle();
             numOfEdits++;
         }
     }
     public class CustomButtonClickHandler13_BackToLast implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (stack.getStack().size()==1) {
+            if (stack.getStack().size() == 0) {
+                JOptionPane.showMessageDialog(frame, "Please upload an image!",
+                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (stack.getStack().size() == 1) {
                 JOptionPane.showMessageDialog(frame, "Can't go back anymore!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -608,13 +608,34 @@ public class UI {
                 stack.getStack().pop();
                 numOfEdits --;
             }
-            currentImage = stack.getStack().peek().image;
+            currentImage = stack.getStack().peek().getImage();
             displayImage();
 
-            String result = stack.getStack().peek().title;
+            String result = stack.getStack().peek().getTitle();
             label6_ImageTitle.setText("Traveled to: " + result);
+            if (stack.getStack().peek().getTranslation() != null) {
+                label8_TranslatedTitle.setText(stack.getStack().peek().getTranslation());
+                label8_TranslatedTitle.setVisible(true);
+            }
+            else {
+                label8_TranslatedTitle.setVisible(false);
+            }
             label6_ImageTitle.setVisible(true);
-
+        }
+    }
+    public class CustomButtonClickHandler14_Trivia implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try
+            {
+                String trivia = getFactService(null);
+                text1_Trivia.setText(trivia);
+                text1_Trivia.setLineWrap(true);
+                text1_Trivia.setVisible(true);
+            } catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
         }
     }
     public void displayImage() {
@@ -625,24 +646,41 @@ public class UI {
 
 
 
-    public String getService() throws IOException {
+    public String getTriviaService() throws IOException {
 
-        String result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
-        System.out.println(result);
-        result = serviceConnection.sendMessage("doll house");
-        System.out.println(result);
-        result = serviceConnection.sendMessage("bnjkbvhjkvjhk");
-        System.out.println(result);
-        result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
-        System.out.println(result);
+        //String result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
+        //System.out.println(result);
+        String result = serviceConnection.sendMessage(".");
+        //System.out.println(result);
+        //result = serviceConnection.sendMessage("bnjkbvhjkvjhk");
+        //System.out.println(result);
+        //result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
+        //System.out.println(result);
 
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
                 "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
         //String result = titleList[(int) ((Math.random() * (12 - 1)) + 1)];
-        label6_ImageTitle.setText("Traveled to: " + result);
-        label6_ImageTitle.setVisible(true);
+
         return result;
+    }
+
+    public String getWordService(String word) throws IOException {
+        OkHttp obj = new OkHttp();
+        String response = (obj.sendGETSync(word, 1));
+        System.out.println(response);
+        label6_ImageTitle.setText("Traveled to: " + response);
+        label6_ImageTitle.setVisible(true);
+        button14_Translate.setVisible(true);
+        return response;
+    }
+
+    public String getFactService(String word) throws IOException {
+        OkHttp obj = new OkHttp();
+        String response = (obj.sendGETSync(word, 2));
+        System.out.println(response);
+        stack.getStack().peek().setTrivia(response);
+        return response;
     }
 
     public int warning() {
@@ -654,7 +692,7 @@ public class UI {
                 JOptionPane.WARNING_MESSAGE,
                 null,
                 options,
-                options[1]);
+                options[0]);
         return n;
     }
 
@@ -667,6 +705,16 @@ public class UI {
                 "Grid Anchor Based Image Cropping",
                 JOptionPane.PLAIN_MESSAGE, null, possibilities, "Center");
         return selection;
+    }
+
+    public void addStackAndTitle() {
+        try {
+            imageTitle = getWordService(null);
+            stack.addToStack(currentImage, imageTitle);
+        } catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
     }
 
 }

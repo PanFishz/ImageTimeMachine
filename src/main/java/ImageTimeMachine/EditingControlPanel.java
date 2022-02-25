@@ -86,7 +86,7 @@ public class EditingControlPanel {
 
     public static BufferedImage surpriseMe(BufferedImage image) {
         Random rand = new Random();
-        int upperbound = 10;
+        int upperbound = 9;
         int randomNumber = rand.nextInt(2);
         int randomFilter;
         for (int i = 0; i < randomNumber + 1; i ++) {
@@ -121,8 +121,6 @@ public class EditingControlPanel {
                 case 9:
                     makeList();
                     image = toollist2.get(randomFilter).processEditing(image);
-
-
                 default:
                     break;
             }

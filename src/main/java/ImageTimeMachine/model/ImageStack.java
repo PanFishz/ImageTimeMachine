@@ -5,7 +5,7 @@ import java.util.Stack;
 
 public class ImageStack {
     private Stack<ImageTitlePair> stack;
-    private final int stackSize = 10;
+    private final int stackSize = 30;
 
     public ImageStack() {
         stack = new Stack<>();
