@@ -26,9 +26,9 @@ public class UI {
     private Label label3_OGImage = new Label("Original photo");
     private Label label4_Step2 = new Label("Step 2. Time Travel ~(^.^)~: ");
     private Label label5_AFImage = new Label("Time-travelled photo");
-    private Label label6_ImageTitle = new Label("                                                          ");
+    private Label label6_ImageTitle = new Label("                                                               ");
     private Label label7_Step3 = new Label("Step 3. Save your journey: ");
-    private Label label8_TranslatedTitle = new Label("                                                     ");
+    //private Label label8_TranslatedTitle = new Label("                                                     ");
     private JTextArea text1_Trivia = new JTextArea(3,40);
 
     private Button button1_Select = new Button("select");
@@ -56,12 +56,12 @@ public class UI {
     private BufferedImage editImage = null;
     private static BufferedImage currentImage = null;
     private BufferedImage masterImage = null;
-    private ImageServiceClient serviceConnection= null; //Todo
+    //private ImageServiceClient serviceConnection= null; //Todo
 
 
     public void initialize() throws IOException {
-        serviceConnection = new ImageServiceClient(); //Todo
-        serviceConnection.startConnection("127.0.0.1", 4444);
+        //serviceConnection = new ImageServiceClient(); //Todo
+        //serviceConnection.startConnection("127.0.0.1", 4444);
 
         frame.setSize(1000, 800);
         frame.setResizable(false);
@@ -69,6 +69,8 @@ public class UI {
         frame.setBackground(Color.white);
         frame.setLayout(spring);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
 
         preEditCanvas = new ImageCanvas(null);
         preEditCanvas.setSize(450, 450);
@@ -108,7 +110,7 @@ public class UI {
         contentPane.add(label5_AFImage);
         contentPane.add(label6_ImageTitle);
         contentPane.add(label7_Step3);
-        contentPane.add(label8_TranslatedTitle);
+        //contentPane.add(label8_TranslatedTitle);
         contentPane.add(button1_Select);
         contentPane.add(button2_ToDisPast);
         contentPane.add(button3_ToPast);
@@ -135,10 +137,13 @@ public class UI {
         label5_AFImage.setForeground(new Color(111, 122, 143));
         label6_ImageTitle.setFont(new Font("Serif", Font.PLAIN, 18));
         label6_ImageTitle.setForeground(new Color(11, 122, 143));
-        label8_TranslatedTitle.setFont(new Font("Serif", Font.PLAIN, 18));
-        label8_TranslatedTitle.setForeground(new Color(11, 122, 143));
+        label6_ImageTitle.setSize(250, 10);
+
+        //label8_TranslatedTitle.setFont(new Font("Serif", Font.PLAIN, 18));
+        //label8_TranslatedTitle.setForeground(new Color(11, 122, 143));
         text1_Trivia.setOpaque(false);
         text1_Trivia.setBackground(Color.lightGray);
+        text1_Trivia.setWrapStyleWord(true);
 
 
 
@@ -263,7 +268,7 @@ public class UI {
                 10, SpringLayout.SOUTH, button2_ToDisPast);
 
         spring.putConstraint(SpringLayout.WEST, button14_Translate,
-                855, SpringLayout.WEST, contentPane);
+                878, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, button14_Translate,
                 5, SpringLayout.SOUTH, postEditCanvas);
 
@@ -298,7 +303,7 @@ public class UI {
 
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
             button14_Translate.setVisible(false);
-            label8_TranslatedTitle.setVisible(false);
+            //label8_TranslatedTitle.setVisible(false);
 
             try {
                 masterImage = ImageIO.read(new File(d));
@@ -348,7 +353,7 @@ public class UI {
     public class CustomButtonClickHandler2_ToPast implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             try {
                 currentImage = toGrayScale(currentImage);
                 displayImage();
@@ -367,7 +372,7 @@ public class UI {
     public class CustomButtonClickHandler3_To1890 implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             try {
                 currentImage = toSepia(currentImage, 10);
                 displayImage();
@@ -386,7 +391,7 @@ public class UI {
     public class CustomButtonClickHandler4_ToDark implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             try {
                 currentImage = toBlue(currentImage);
                 currentImage = toSepia(currentImage, 10);
@@ -501,7 +506,7 @@ public class UI {
             displayImage();
             label6_ImageTitle.setText("                  Back to the Present");
             label6_ImageTitle.setVisible(true);
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             stack = new ImageStack();
             stack.addToStack(currentImage, "The Present");
 
@@ -536,7 +541,7 @@ public class UI {
     public class CustomButtonClickHandler10_SurpriseMe implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             try{
                 currentImage = masterImage;
                 currentImage = surpriseMe(currentImage);
@@ -556,7 +561,7 @@ public class UI {
     public class CustomButtonClickHandler11_ToFuture implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
 
             try{
                 currentImage = toNeon(currentImage);
@@ -576,7 +581,7 @@ public class UI {
     public class CustomButtonClickHandler12_ToUnknown implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            label8_TranslatedTitle.setVisible(false);
+            text1_Trivia.setVisible(false);
             try{
                 currentImage = toNegative(currentImage);
                 displayImage();
@@ -614,11 +619,11 @@ public class UI {
             String result = stack.getStack().peek().getTitle();
             label6_ImageTitle.setText("Traveled to: " + result);
             if (stack.getStack().peek().getTranslation() != null) {
-                label8_TranslatedTitle.setText(stack.getStack().peek().getTranslation());
-                label8_TranslatedTitle.setVisible(true);
+                text1_Trivia.setText(stack.getStack().peek().getTranslation());
+                text1_Trivia.setVisible(true);
             }
             else {
-                label8_TranslatedTitle.setVisible(false);
+                text1_Trivia.setVisible(false);
             }
             label6_ImageTitle.setVisible(true);
         }
@@ -628,10 +633,8 @@ public class UI {
         public void actionPerformed(ActionEvent e) {
             try
             {
-                String trivia = getFactService(null);
-                text1_Trivia.setText(trivia);
-                text1_Trivia.setLineWrap(true);
-                text1_Trivia.setVisible(true);
+                getFactService(null);
+
             } catch (IOException ex)
             {
                 ex.printStackTrace();
@@ -650,7 +653,7 @@ public class UI {
 
         //String result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
         //System.out.println(result);
-        String result = serviceConnection.sendMessage(".");
+        //String result = serviceConnection.sendMessage(".");
         //System.out.println(result);
         //result = serviceConnection.sendMessage("bnjkbvhjkvjhk");
         //System.out.println(result);
@@ -660,7 +663,7 @@ public class UI {
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
                 "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
-        //String result = titleList[(int) ((Math.random() * (12 - 1)) + 1)];
+        String result = titleList[(int) ((Math.random() * (12 - 1)) + 1)];
 
         return result;
     }
@@ -669,7 +672,7 @@ public class UI {
         OkHttp obj = new OkHttp();
         String response = (obj.sendGETSync(word, 1));
         System.out.println(response);
-        label6_ImageTitle.setText("Traveled to: " + response);
+        label6_ImageTitle.setText("Traveled to: " + response + "              ");
         label6_ImageTitle.setVisible(true);
         button14_Translate.setVisible(true);
         return response;
@@ -679,6 +682,9 @@ public class UI {
         OkHttp obj = new OkHttp();
         String response = (obj.sendGETSync(word, 2));
         System.out.println(response);
+        text1_Trivia.setText(response);
+        text1_Trivia.setLineWrap(true);
+        text1_Trivia.setVisible(true);
         stack.getStack().peek().setTrivia(response);
         return response;
     }
