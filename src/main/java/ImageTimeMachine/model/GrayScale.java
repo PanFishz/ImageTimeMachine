@@ -1,7 +1,5 @@
 package ImageTimeMachine.model;
 
-import java.awt.image.BufferedImage;
-
 public class GrayScale extends Filter{
     public GrayScale() {
         super(FilterType.GRAY);

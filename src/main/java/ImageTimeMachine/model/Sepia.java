@@ -1,7 +1,5 @@
 package ImageTimeMachine.model;
 
-import java.awt.image.BufferedImage;
-
 public class Sepia extends Filter{
     private int sepiaIntensity = 10;
 

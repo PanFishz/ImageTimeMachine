@@ -1,7 +1,5 @@
 package ImageTimeMachine.model;
 
-import java.awt.image.BufferedImage;
-
 public class Negative extends Filter{
     public Negative() {
         super(FilterType.NEGATIVE);

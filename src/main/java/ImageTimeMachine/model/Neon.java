@@ -1,7 +1,5 @@
 package ImageTimeMachine.model;
 
-import java.awt.image.BufferedImage;
-
 public class Neon extends Filter{
     public Neon() {
         super(FilterType.NEON);

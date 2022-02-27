@@ -1,7 +1,5 @@
 package ImageTimeMachine.model;
 
-import java.awt.image.BufferedImage;
-
 public class Red extends Filter{
     public Red() {
         super(FilterType.RED);

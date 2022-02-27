@@ -26,10 +26,9 @@ public class UI {
     private Label label3_OGImage = new Label("Original photo");
     private Label label4_Step2 = new Label("Step 2. Time Travel ~(^.^)~: ");
     private Label label5_AFImage = new Label("Time-travelled photo");
-    private Label label6_ImageTitle = new Label("                                                               ");
     private Label label7_Step3 = new Label("Step 3. Save your journey: ");
-    //private Label label8_TranslatedTitle = new Label("                                                     ");
     private JTextArea text1_Trivia = new JTextArea(3,40);
+    private JTextArea text2_ImageTitle = new JTextArea("                                                               ");
 
     private Button button1_Select = new Button("select");
     private Button button2_ToDisPast = new Button("To the Distant Past");
@@ -44,7 +43,7 @@ public class UI {
     private Button button11_ToFuture = new Button("To the Future!!");
     private Button button12_ToUnknown = new Button("To the Unknown!!");
     private Button button13_BackToLast = new Button("Back to the previous time period");
-    private Button button14_Translate = new Button("Trivia");
+    private Button button14_Trivia = new Button("Trivia");
     private static int numOfEdits = 0;
 
     private ImageCanvas preEditCanvas;
@@ -56,6 +55,7 @@ public class UI {
     private BufferedImage editImage = null;
     private static BufferedImage currentImage = null;
     private BufferedImage masterImage = null;
+    private OkHttp obj = new OkHttp();
     //private ImageServiceClient serviceConnection= null; //Todo
 
 
@@ -69,8 +69,6 @@ public class UI {
         frame.setBackground(Color.white);
         frame.setLayout(spring);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
 
         preEditCanvas = new ImageCanvas(null);
         preEditCanvas.setSize(450, 450);
@@ -94,13 +92,7 @@ public class UI {
         button11_ToFuture.addActionListener(new CustomButtonClickHandler11_ToFuture());
         button12_ToUnknown.addActionListener(new CustomButtonClickHandler12_ToUnknown());
         button13_BackToLast.addActionListener(new CustomButtonClickHandler13_BackToLast());
-        button14_Translate.addActionListener(new CustomButtonClickHandler14_Trivia());
-
-
-        button5_ToSave.setForeground(new Color(126, 165, 242) );
-        button9_AdvanceOptions.setForeground(new Color(6, 155, 134) );
-        button10_SurpriseMe.setForeground(new Color(156, 65, 134) );
-
+        button14_Trivia.addActionListener(new CustomButtonClickHandler14_Trivia());
 
         contentPane.setLayout(spring);
         contentPane.add(label1_Title);
@@ -108,9 +100,8 @@ public class UI {
         contentPane.add(label3_OGImage);
         contentPane.add(label4_Step2);
         contentPane.add(label5_AFImage);
-        contentPane.add(label6_ImageTitle);
+        contentPane.add(text2_ImageTitle);
         contentPane.add(label7_Step3);
-        //contentPane.add(label8_TranslatedTitle);
         contentPane.add(button1_Select);
         contentPane.add(button2_ToDisPast);
         contentPane.add(button3_ToPast);
@@ -124,28 +115,31 @@ public class UI {
         contentPane.add(button11_ToFuture);
         contentPane.add(button12_ToUnknown);
         contentPane.add(button13_BackToLast);
-        contentPane.add(button14_Translate);
+        contentPane.add(button14_Trivia);
         contentPane.add(preEditCanvas);
         contentPane.add(postEditCanvas);
         contentPane.add(homeCanvas);
         contentPane.add(text1_Trivia);
+
+        button5_ToSave.setForeground(new Color(126, 165, 242) );
+        button9_AdvanceOptions.setForeground(new Color(6, 155, 134) );
+        button10_SurpriseMe.setForeground(new Color(156, 65, 134) );
 
         label1_Title.setFont(new Font("Serif", Font.PLAIN, 25));
         label3_OGImage.setFont(new Font("Serif", Font.PLAIN, 10));
         label3_OGImage.setForeground(new Color(111, 122, 143));
         label5_AFImage.setFont(new Font("Serif", Font.PLAIN, 10));
         label5_AFImage.setForeground(new Color(111, 122, 143));
-        label6_ImageTitle.setFont(new Font("Serif", Font.PLAIN, 18));
-        label6_ImageTitle.setForeground(new Color(11, 122, 143));
-        label6_ImageTitle.setSize(250, 10);
+        text2_ImageTitle.setFont(new Font("Serif", Font.PLAIN, 18));
+        text2_ImageTitle.setForeground(new Color(11, 122, 143));
+        text2_ImageTitle.setSize(450, 10);
 
-        //label8_TranslatedTitle.setFont(new Font("Serif", Font.PLAIN, 18));
-        //label8_TranslatedTitle.setForeground(new Color(11, 122, 143));
         text1_Trivia.setOpaque(false);
         text1_Trivia.setBackground(Color.lightGray);
+        text1_Trivia.setSize(350, 200);
         text1_Trivia.setWrapStyleWord(true);
-
-
+        text2_ImageTitle.setOpaque(false);
+        text2_ImageTitle.setBackground(Color.lightGray);
 
         spring.putConstraint(SpringLayout.WEST, label1_Title,
                 50, SpringLayout.WEST, contentPane);
@@ -197,15 +191,15 @@ public class UI {
         spring.putConstraint(SpringLayout.NORTH, label5_AFImage,
                 68, SpringLayout.NORTH, contentPane);
 
-        spring.putConstraint(SpringLayout.WEST, label6_ImageTitle,
+        spring.putConstraint(SpringLayout.WEST, text2_ImageTitle,
                 390, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label6_ImageTitle,
+        spring.putConstraint(SpringLayout.NORTH, text2_ImageTitle,
                 7, SpringLayout.SOUTH, preEditCanvas);
 
         spring.putConstraint(SpringLayout.WEST, text1_Trivia,
                 500, SpringLayout.WEST, contentPane);
         spring.putConstraint(SpringLayout.NORTH, text1_Trivia,
-                7, SpringLayout.SOUTH, label6_ImageTitle);
+                7, SpringLayout.SOUTH, text2_ImageTitle);
 
         spring.putConstraint(SpringLayout.WEST, label2_Step1,
                 50, SpringLayout.WEST, contentPane);
@@ -267,12 +261,12 @@ public class UI {
         spring.putConstraint(SpringLayout.NORTH, button13_BackToLast,
                 10, SpringLayout.SOUTH, button2_ToDisPast);
 
-        spring.putConstraint(SpringLayout.WEST, button14_Translate,
-                878, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button14_Translate,
-                5, SpringLayout.SOUTH, postEditCanvas);
+        spring.putConstraint(SpringLayout.WEST, button14_Trivia,
+                390, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, button14_Trivia,
+                7, SpringLayout.SOUTH, text2_ImageTitle);
 
-        button14_Translate.setVisible(false);
+        button14_Trivia.setVisible(false);
         frame.setVisible(true);
 
         BufferedImage homeImage = null;
@@ -287,7 +281,7 @@ public class UI {
         homeCanvas.setVisible(true);
         preEditCanvas.setVisible(false);
         postEditCanvas.setVisible(false);
-        label6_ImageTitle.setVisible(false);
+        text2_ImageTitle.setVisible(false);
     }
 
     private void imageLoading() throws IOException {
@@ -296,14 +290,13 @@ public class UI {
                 return;
             }
         }
-
+        text1_Trivia.setVisible(false);
         fileDialog.setVisible(true);
 
         if (fileDialog.getFile() != null) {
 
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
-            button14_Translate.setVisible(false);
-            //label8_TranslatedTitle.setVisible(false);
+            button14_Trivia.setVisible(false);
 
             try {
                 masterImage = ImageIO.read(new File(d));
@@ -323,15 +316,13 @@ public class UI {
             preEditCanvas.setImage(editImage);
             preEditCanvas.repaint();
             BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
-            //URL url = new URL("http://abeautifulmess.com/wp-content/uploads/2021/07/dollhouse5.jpg");
-            //BufferedImage blank_image = ImageIO.read(url);
 
             postEditCanvas.setImage(blank_image);
             postEditCanvas.repaint();
             homeCanvas.setVisible(false);
             preEditCanvas.setVisible(true);
             postEditCanvas.setVisible(true);
-            label6_ImageTitle.setVisible(false);
+            text2_ImageTitle.setVisible(false);
             label2_Step1.setText("Step 1: Select another photo: ");
             numOfEdits = 0;
         }
@@ -358,7 +349,7 @@ public class UI {
                 currentImage = toGrayScale(currentImage);
                 displayImage();
             } catch (Exception ex) {
-                label6_ImageTitle.setVisible(false);
+                text2_ImageTitle.setVisible(false);
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame, "Please upload your image!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
@@ -442,51 +433,56 @@ public class UI {
     public class CustomButtonClickHandler7_ToSave implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(currentImage == null) {
+            if (currentImage == null) {
                 JOptionPane.showMessageDialog(frame, "No image to save!",
                         "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            JFileChooser savechooser = new JFileChooser();
-            FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
-            savechooser.addChoosableFileFilter(pngFilter);
-            savechooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg"));
-            savechooser.addChoosableFileFilter(new FileNameExtensionFilter("GIF File", "gif"));
 
-            savechooser.setFileFilter(pngFilter); // Default choose PNG
+            try {
+                //dropdown menu for saved file formats
+                JFileChooser fileChooser = new JFileChooser();
+                FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
+                fileChooser.addChoosableFileFilter(pngFilter);
+                fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg"));
 
-            int returnVal = savechooser.showSaveDialog(null);
+                fileChooser.setFileFilter(pngFilter); // Default value of the dropdown menu: PNG
 
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File file = savechooser.getSelectedFile();
+                int returnVal = fileChooser.showSaveDialog(null); //get user input "save" or "cancel"
 
-                FileNameExtensionFilter currentFilter = (FileNameExtensionFilter) savechooser.getFileFilter();
-                String ext = currentFilter.getExtensions()[0];
+                if (returnVal == JFileChooser.APPROVE_OPTION) { //user input chooses "save"
+                    File file = fileChooser.getSelectedFile();
 
-                String fileName = file.getName() + "_" + stack.getStack().peek().getTitle();
-                file = new File(file.getParent(), fileName + "." + ext);
+                    FileNameExtensionFilter currentFilter = (FileNameExtensionFilter) fileChooser.getFileFilter();
+                    String ext = currentFilter.getExtensions()[0];
 
-                if (!currentFilter.accept(file)) {
-                    // File does not have the correct extension, fix it
-                    fileName = file.getName();
+                    //append image title to file name
+                    String fileName = file.getName() + "_" + stack.getStack().peek().getTitle();
                     file = new File(file.getParent(), fileName + "." + ext);
-                }
 
-                String format = "jpg".equals(ext) ? "JPEG" : ext;
-                // May not be strictly necessary, just a reminder that file ext != file format
-
-                try {
-                    if (!ImageIO.write(currentImage, format, file)) {
-                        JOptionPane.showMessageDialog(frame, "Image not saved, choose another format!",
-                                "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                    if (!currentFilter.accept(file))
+                    {
+                        // File does not have the correct extension, fix it
+                        fileName = file.getName();
+                        file = new File(file.getParent(), fileName + "." + ext);
                     }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+
+                    String format = "jpg".equals(ext) ? "JPEG" : ext;
+                    ImageIO.write(currentImage, format, file);
+
                 }
-                numOfEdits = 0;
+
+            } catch(Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Image not saved, choose another format!",
+                            "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+                    ex.printStackTrace();
             }
+            numOfEdits = 0;
         }
+
     }
+
+
 
     public class CustomButtonClickHandler8_BackToPresent implements ActionListener {
         @Override
@@ -504,12 +500,11 @@ public class UI {
             }
             currentImage = masterImage;
             displayImage();
-            label6_ImageTitle.setText("                  Back to the Present");
-            label6_ImageTitle.setVisible(true);
+            text2_ImageTitle.setText("                  Back to the Present");
+            text2_ImageTitle.setVisible(true);
             text1_Trivia.setVisible(false);
             stack = new ImageStack();
             stack.addToStack(currentImage, "The Present");
-
             numOfEdits = 0;
         }
     }
@@ -617,7 +612,7 @@ public class UI {
             displayImage();
 
             String result = stack.getStack().peek().getTitle();
-            label6_ImageTitle.setText("Traveled to: " + result);
+            text2_ImageTitle.setText("Traveled to: " + result);
             if (stack.getStack().peek().getTranslation() != null) {
                 text1_Trivia.setText(stack.getStack().peek().getTranslation());
                 text1_Trivia.setVisible(true);
@@ -625,7 +620,7 @@ public class UI {
             else {
                 text1_Trivia.setVisible(false);
             }
-            label6_ImageTitle.setVisible(true);
+            text2_ImageTitle.setVisible(true);
         }
     }
     public class CustomButtonClickHandler14_Trivia implements ActionListener {
@@ -634,6 +629,10 @@ public class UI {
             try
             {
                 getFactService(null);
+                //String result = serviceConnection.sendMessage("raining tacos");
+                //System.out.print(result);
+
+                //getTriviaService();
 
             } catch (IOException ex)
             {
@@ -651,15 +650,8 @@ public class UI {
 
     public String getTriviaService() throws IOException {
 
-        //String result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
-        //System.out.println(result);
-        //String result = serviceConnection.sendMessage(".");
-        //System.out.println(result);
-        //result = serviceConnection.sendMessage("bnjkbvhjkvjhk");
-        //System.out.println(result);
-        //result = serviceConnection.sendMessage("smol_cat"); //yufyvuvhvhy //rubber duck
-        //System.out.println(result);
-
+        String response = (obj.sendGETSync(stack.getStack().peek().getTitle(), 3));
+        System.out.println(response);//yufyvuvhvhy //rubber duck
         String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
                 "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
                 "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
@@ -669,17 +661,15 @@ public class UI {
     }
 
     public String getWordService(String word) throws IOException {
-        OkHttp obj = new OkHttp();
         String response = (obj.sendGETSync(word, 1));
         System.out.println(response);
-        label6_ImageTitle.setText("Traveled to: " + response + "              ");
-        label6_ImageTitle.setVisible(true);
-        button14_Translate.setVisible(true);
+        text2_ImageTitle.setText("Traveled to: " + response);
+        text2_ImageTitle.setVisible(true);
+        button14_Trivia.setVisible(true);
         return response;
     }
 
     public String getFactService(String word) throws IOException {
-        OkHttp obj = new OkHttp();
         String response = (obj.sendGETSync(word, 2));
         System.out.println(response);
         text1_Trivia.setText(response);
