@@ -1,6 +1,7 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
-public class GrayScaleAndBlue extends Filter{
+
+public class GrayScaleAndBlue extends Filter {
     public GrayScaleAndBlue() {
         super(FilterType.GRAYBLUE);
     }
@@ -9,7 +10,7 @@ public class GrayScaleAndBlue extends Filter{
     public int calculatingRGB(int a, int r, int g, int b, int p) {
         if (r <= 50 && g <= 50 && b <= 50) {
 
-            p = (a << 24) | (0 << 16) | (0 << 8) | 255;
+            p = (a << 24) | 255;
 
             return p;
         }

@@ -1,9 +1,9 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
 import java.awt.image.BufferedImage;
 
 abstract class Filter extends Transformer {
-    private FilterType filterType;
+    private final FilterType filterType;
 
 
     public Filter(FilterType filterType) {
@@ -23,15 +23,20 @@ abstract class Filter extends Transformer {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
         BufferedImage editedImage = makeNewImage(imageWidth, imageHeight);
+        return processImage(image, editedImage, imageWidth, imageHeight);
+    }
+
+    public BufferedImage processImage(BufferedImage image, BufferedImage editedImage, int imageWidth, int imageHeight) {
+        int p, a, r, g, b;
         for (int y = 0; y < imageHeight; y++) {
             for (int x = 0; x < imageWidth; x++) {
 
-                int p = image.getRGB(x, y);
+                p = image.getRGB(x, y);
 
-                int a = (p >> 24) & 0xff;
-                int r = (p >> 16) & 0xff;
-                int g = (p >> 8) & 0xff;
-                int b = p & 0xff;
+                a = (p >> 24) & 0xff;
+                r = (p >> 16) & 0xff;
+                g = (p >> 8) & 0xff;
+                b = p & 0xff;
 
                 p = calculatingRGB(a, r, g, b, p);
 

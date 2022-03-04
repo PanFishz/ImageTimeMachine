@@ -5,8 +5,9 @@ import java.awt.*;
 public class ImageCanvas extends Canvas {
     private Image img;
 
-    public ImageCanvas(Image img) {
+    public ImageCanvas(Image img, int width, int height) {
         this.img = img;
+        this.setSize(width, height);
     }
 
     public void paint(Graphics g) {

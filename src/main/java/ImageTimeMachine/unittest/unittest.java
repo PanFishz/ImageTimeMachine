@@ -1,5 +1,8 @@
-package ImageTimeMachine;
-import ImageTimeMachine.model.*;
+package ImageTimeMachine.unittest;
+import ImageTimeMachine.model.editingTools.GrayScale;
+import ImageTimeMachine.model.editingTools.Negative;
+import ImageTimeMachine.model.editingTools.Neon;
+import ImageTimeMachine.model.editingTools.Sepia;
 import junit.framework.*;
 import org.junit.jupiter.api.BeforeEach;
 

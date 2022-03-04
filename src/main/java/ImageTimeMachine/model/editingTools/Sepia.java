@@ -1,6 +1,7 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
-public class Sepia extends Filter{
+
+public class Sepia extends Filter {
     private int sepiaIntensity = 10;
 
     public Sepia() {

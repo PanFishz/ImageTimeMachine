@@ -1,6 +1,7 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
-public class GrayScale extends Filter{
+
+public class GrayScale extends Filter {
     public GrayScale() {
         super(FilterType.GRAY);
     }

@@ -1,4 +1,4 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
 
 

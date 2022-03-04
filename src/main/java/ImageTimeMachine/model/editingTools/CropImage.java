@@ -1,10 +1,10 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class CropImage extends Transformer {
-    private FilterType filterType;
+    private final FilterType filterType;
     private String option = "center";;
 
     public CropImage() {

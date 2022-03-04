@@ -1,10 +1,10 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class ScaleImage extends Transformer {
-    private FilterType filterType;
+    private final FilterType filterType;
     private int targetWidth = 450;
     private int targetHeight = 450;
 

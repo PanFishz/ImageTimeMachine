@@ -2,19 +2,19 @@ package ImageTimeMachine.model;
 
 import java.awt.image.BufferedImage;
 
-public class ImageTitlePair {
-    private BufferedImage image;
-    private String title;
-    private String translation;
+public class ImageTitleTrivia {
+    private final BufferedImage image;
+    private final String title;
+    private String trivia;
 
-    public ImageTitlePair(BufferedImage image, String title) {
+    public ImageTitleTrivia(BufferedImage image, String title) {
         this.image = image;
         this.title = title;
-        this.translation = null;
+        this.trivia = null;
     }
 
     public void setTrivia(String translation) {
-        this.translation = translation;
+        this.trivia = translation;
     }
 
     public BufferedImage getImage() {
@@ -25,7 +25,7 @@ public class ImageTitlePair {
         return title;
     }
 
-    public String getTranslation() {
-        return translation;
+    public String getTrivia() {
+        return trivia;
     }
 }

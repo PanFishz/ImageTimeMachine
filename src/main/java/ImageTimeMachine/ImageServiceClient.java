@@ -20,8 +20,7 @@ public class ImageServiceClient {
 
     public String sendMessage(String msg) throws IOException {
         out.println(msg);
-        String resp = in.readLine();
-        return resp;
+        return in.readLine();
     }
 
     public void stopConnection() throws IOException {
@@ -29,4 +28,5 @@ public class ImageServiceClient {
         out.close();
         clientSocket.close();
     }
+
 }

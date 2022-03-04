@@ -1,9 +1,7 @@
 package ImageTimeMachine;
 
-import java.io.IOException;
-
 public class ImageTimeMachine {
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) {
         UI timeMachine = new UI();
         timeMachine.initialize();
         }

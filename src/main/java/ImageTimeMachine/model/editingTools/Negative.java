@@ -1,6 +1,7 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
-public class Negative extends Filter{
+
+public class Negative extends Filter {
     public Negative() {
         super(FilterType.NEGATIVE);
     }

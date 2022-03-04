@@ -1,37 +1,41 @@
 package ImageTimeMachine;
 
 import ImageTimeMachine.model.*;
+import ImageTimeMachine.model.editingTools.*;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class EditingControlPanel {
-    private static ScaleImage scaleImageTool = new ScaleImage();;
-    private static CropImage cropImageTool = new CropImage();
-    private static GrayScale grayFilter = new GrayScale();
+    private static final ScaleImage scaleImageTool = new ScaleImage();
+    private static final CropImage cropImageTool = new CropImage();
+    private static final GrayScale grayFilter = new GrayScale();
     private static GrayScaleAndBlue grayBlueFilter = new GrayScaleAndBlue();
     private static Blue blueFilter = new Blue();
     private static Negative negativeFilter = new Negative();
     private static Neon neonFilter = new Neon();
     private static NeonMore neonMoreFilter = new NeonMore();
     private static Red redFilter = new Red();
-    private static Sepia sepiaFilter = new Sepia();
-    private Transformer[] toolList = new Transformer[10];
-    private static ArrayList<Transformer> toollist2= new ArrayList<>();
+    private static final Sepia sepiaFilter = new Sepia();
+    private static final ensureOpaqueFree opaqueFree= new ensureOpaqueFree();
+    private static final ArrayList<Transformer> toollist = new ArrayList<>();
 
     public static void makeList() {
-        toollist2.add(grayBlueFilter);
-        toollist2.add(grayFilter);
-        toollist2.add(blueFilter);
-        toollist2.add(negativeFilter);
-        toollist2.add(neonFilter);
-        toollist2.add(redFilter);
-        toollist2.add(sepiaFilter);
-        toollist2.add(neonMoreFilter);
+        toollist.add(grayBlueFilter);
+        toollist.add(grayFilter);
+        toollist.add(blueFilter);
+        toollist.add(negativeFilter);
+        toollist.add(neonFilter);
+        toollist.add(redFilter);
+        toollist.add(sepiaFilter);
+        toollist.add(neonMoreFilter);
         Sepia sepiaFilter2 = new Sepia();
         sepiaFilter2.setSepiaIntensity(90);
-        toollist2.add(sepiaFilter2);
+        toollist.add(sepiaFilter2);
+    }
+    public static BufferedImage opaqueFree(BufferedImage sourceImage) {
+        return opaqueFree.opaqueFree(sourceImage);
     }
 
     public static BufferedImage scaleImage(BufferedImage sourceImage, int targetWidth, int targetHeight) {
@@ -84,7 +88,7 @@ public class EditingControlPanel {
         return neonMoreFilter.processEditing(sourceImage);
     }
 
-    public static BufferedImage surpriseMe(BufferedImage image) {
+    static BufferedImage surpriseMe(BufferedImage image) {
         Random rand = new Random();
         int upperbound = 9;
         int randomNumber = rand.nextInt(2);
@@ -120,7 +124,7 @@ public class EditingControlPanel {
                     image = toBlue(image);
                 case 9:
                     makeList();
-                    image = toollist2.get(randomFilter).processEditing(image);
+                    image = toollist.get(randomFilter).processEditing(image);
                 default:
                     break;
             }

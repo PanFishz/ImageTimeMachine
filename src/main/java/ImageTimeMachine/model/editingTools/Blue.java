@@ -1,7 +1,7 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
 
-public class Blue extends Filter{
+public class Blue extends Filter {
     public Blue() {
         super(FilterType.BLUE);
     }

@@ -1,687 +1,510 @@
 package ImageTimeMachine;
 
+import ImageTimeMachine.model.FileUtil;
 import ImageTimeMachine.model.ImageCanvas;
-import ImageTimeMachine.model.ImageStack;
+import ImageTimeMachine.model.ImageManager;
+
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import static ImageTimeMachine.EditingControlPanel.*;
+import static ImageTimeMachine.model.style.ColorPicker.*;
+import static ImageTimeMachine.model.style.FontPicker.*;
 
 public class UI {
+    //region Members
     private final JFrame frame = new JFrame("Image TiMeMaChInE - A Photo Editing Tool");
-    private static ImageStack stack = new ImageStack();
-    private String imageTitle = null;
 
-    private Label label1_Title = new Label("Image TiMeMaChInE - " +
-            "send your photos to a different time");
-    private Label label2_Step1 = new Label("Step 1. Choose your image:     ");
-    private Label label3_OGImage = new Label("Original photo");
-    private Label label4_Step2 = new Label("Step 2. Time Travel ~(^.^)~: ");
-    private Label label5_AFImage = new Label("Time-travelled photo");
-    private Label label7_Step3 = new Label("Step 3. Save your journey: ");
-    private JTextArea text1_Trivia = new JTextArea(3,40);
-    private JTextArea text2_ImageTitle = new JTextArea("                                                               ");
+    private final Label labTitle = new Label("Image TiMeMaChInE - send your photos to a different time");
+    private final Label labStep1 = new Label("Step 1. Choose your image:     ");
+    private final Label labOGImage = new Label("Original photo");
+    private final Label labStep2 = new Label("Step 2. Time Travel ~(^.^)~: ");
+    private final Label labAFImage = new Label("Time-travelled photo");
+    private final Label labStep3 = new Label("Step 3. Save your journey: ");
 
-    private Button button1_Select = new Button("select");
-    private Button button2_ToDisPast = new Button("To the Distant Past");
-    private Button button3_ToPast = new Button("To the Past");
-    private Button button4_ToDark = new Button("To the Dark Ages");
-    private Button button5_ToSave = new Button("Save Image");
-    private Button button6_Tutorial = new Button("Tutorial");
-    private Button button7_Examples = new Button("More Examples");
-    private Button button8_BackPresent = new Button("Back to the Present");
-    private Button button9_AdvanceOptions = new Button("Advanced Options");
-    private Button button10_SurpriseMe = new Button("Surprise Me!!");
-    private Button button11_ToFuture = new Button("To the Future!!");
-    private Button button12_ToUnknown = new Button("To the Unknown!!");
-    private Button button13_BackToLast = new Button("Back to the previous time period");
-    private Button button14_Trivia = new Button("Trivia");
-    private static int numOfEdits = 0;
+    private final JTextArea txtTrivia = new JTextArea(2, 37);
+    private final JTextArea txtImageTitle = new JTextArea("");
 
-    private ImageCanvas preEditCanvas;
-    private ImageCanvas postEditCanvas;
-    private ImageCanvas homeCanvas;
-    private FileDialog fileDialog = new FileDialog(frame, "Open", FileDialog.LOAD);
-    private SpringLayout spring = new SpringLayout();
-    private Container contentPane = frame.getContentPane();
-    private BufferedImage editImage = null;
-    private static BufferedImage currentImage = null;
-    private BufferedImage masterImage = null;
-    private OkHttp obj = new OkHttp();
-    //private ImageServiceClient serviceConnection= null; //Todo
+    private final Button btnUploadImage = new Button("Upload");
+    private final Button btnToDisPast = new Button("To the Distant Past");
+    private final Button btnToPast = new Button("To the Past");
+    private final Button btnToDark = new Button("To the Dark Ages");
+    private final Button btnToSave = new Button("Save Image");
+    private final Button btnTutorial = new Button("Tutorial");
+    private final Button btnExamples = new Button("More Examples");
+    private final Button btnBack2Present = new Button("Back to the Present");
+    private final Button btnAdvanceOptions = new Button("Advanced Options");
+    private final Button btnSurpriseMe = new Button("Surprise Me!!");
+    private final Button btnToFuture = new Button("To the Future!!");
+    private final Button btnToUnknown = new Button("To the Unknown!!");
+    private final Button btnBackToLast = new Button("Back to the previous time period");
+    private final Button btnTrivia = new Button("Trivia");
+    private final Button btnSelectFromWeb = new Button("Select From Web");
 
+    private final ImageCanvas preEditCanvas = new ImageCanvas(null, 450, 450);
+    private final ImageCanvas postEditCanvas = new ImageCanvas(null, 450, 450);
+    private final ImageCanvas homeCanvas = new ImageCanvas(null, 900, 450);
 
-    public void initialize() throws IOException {
-        //serviceConnection = new ImageServiceClient(); //Todo
-        //serviceConnection.startConnection("127.0.0.1", 4444);
+    private final FileDialog fileDialog = new FileDialog(frame, "Open", FileDialog.LOAD);
+    private final SpringLayout spring = new SpringLayout();
+    private final Container contentPane = frame.getContentPane();
+    private final ImageManager imageManager = new ImageManager();
+    private final FileUtil fileUtil = new FileUtil();
+    private final OkHttp okHttp = new OkHttp();
+    //endregion
 
+    public void initialize() {
+        // declare UI components and initial setup
+        configureJFrame();
+        setupClickHandlers();
+        addToContentPane();
+        addStyles();
+        putConstraint();
+        setupHome();
+    }
+
+    private void putConstraint() {
+        spring.putConstraint(SpringLayout.WEST, labTitle, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, labTitle, 10, SpringLayout.NORTH, contentPane);
+
+        spring.putConstraint(SpringLayout.WEST, btnTutorial, 100, SpringLayout.EAST, labTitle);
+        spring.putConstraint(SpringLayout.NORTH, btnTutorial, 5, SpringLayout.NORTH, contentPane);
+
+        spring.putConstraint(SpringLayout.WEST, btnExamples, 820, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnExamples, 30, SpringLayout.NORTH, btnTutorial);
+
+        spring.putConstraint(SpringLayout.WEST, preEditCanvas, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, preEditCanvas, 40, SpringLayout.SOUTH, labTitle);
+
+        spring.putConstraint(SpringLayout.WEST, postEditCanvas, 450, SpringLayout.WEST, preEditCanvas);
+        spring.putConstraint(SpringLayout.NORTH, postEditCanvas, 40, SpringLayout.SOUTH, labTitle);
+
+        spring.putConstraint(SpringLayout.WEST, homeCanvas, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, homeCanvas, 40, SpringLayout.SOUTH, labTitle);
+
+        spring.putConstraint(SpringLayout.WEST, labOGImage, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, labOGImage, 68, SpringLayout.NORTH, contentPane);
+
+        spring.putConstraint(SpringLayout.WEST, labStep2, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, labStep2, 30, SpringLayout.SOUTH, labStep1);
+
+        spring.putConstraint(SpringLayout.WEST, labStep3, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, labStep3, 60, SpringLayout.SOUTH, labStep2);
+
+        spring.putConstraint(SpringLayout.WEST, labAFImage, 725, SpringLayout.EAST, labOGImage);
+        spring.putConstraint(SpringLayout.NORTH, labAFImage, 68, SpringLayout.NORTH, contentPane);
+
+        spring.putConstraint(SpringLayout.WEST, txtImageTitle, 390, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, txtImageTitle, 7, SpringLayout.SOUTH, preEditCanvas);
+
+        spring.putConstraint(SpringLayout.WEST, txtTrivia, 500, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, txtTrivia, 7, SpringLayout.SOUTH, txtImageTitle);
+
+        spring.putConstraint(SpringLayout.WEST, labStep1, 50, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, labStep1, 80, SpringLayout.SOUTH, preEditCanvas);
+
+        spring.putConstraint(SpringLayout.WEST, btnUploadImage, 240, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnUploadImage, 76, SpringLayout.SOUTH, preEditCanvas);
+
+        spring.putConstraint(SpringLayout.WEST, btnSelectFromWeb, 330, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnSelectFromWeb, 76, SpringLayout.SOUTH, preEditCanvas);
+
+        spring.putConstraint(SpringLayout.WEST, btnToDisPast, 240, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToDisPast, 15, SpringLayout.SOUTH, btnUploadImage);
+
+        spring.putConstraint(SpringLayout.WEST, btnToPast, 405, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToPast, 15, SpringLayout.SOUTH, btnUploadImage);
+
+        spring.putConstraint(SpringLayout.WEST, btnToDark, 515, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToDark, 15, SpringLayout.SOUTH, btnUploadImage);
+
+        spring.putConstraint(SpringLayout.WEST, btnToFuture, 665, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToFuture, 15, SpringLayout.SOUTH, btnUploadImage);
+
+        spring.putConstraint(SpringLayout.WEST, btnToUnknown, 800, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToUnknown, 15, SpringLayout.SOUTH, btnUploadImage);
+
+        spring.putConstraint(SpringLayout.WEST, btnToSave, 240, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnToSave, 56, SpringLayout.SOUTH, labStep2);
+
+        spring.putConstraint(SpringLayout.WEST, btnBack2Present, 240, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnBack2Present, 10, SpringLayout.SOUTH, btnToDisPast);
+
+        spring.putConstraint(SpringLayout.WEST, btnAdvanceOptions, 170, SpringLayout.WEST, btnBack2Present);
+        spring.putConstraint(SpringLayout.NORTH, btnAdvanceOptions, 10, SpringLayout.SOUTH, btnToDisPast);
+
+        spring.putConstraint(SpringLayout.WEST, btnSurpriseMe, 170, SpringLayout.WEST, btnAdvanceOptions);
+        spring.putConstraint(SpringLayout.NORTH, btnSurpriseMe, 10, SpringLayout.SOUTH, btnToDisPast);
+
+        spring.putConstraint(SpringLayout.WEST, btnBackToLast, 130, SpringLayout.WEST, btnSurpriseMe);
+        spring.putConstraint(SpringLayout.NORTH, btnBackToLast, 10, SpringLayout.SOUTH, btnToDisPast);
+
+        spring.putConstraint(SpringLayout.WEST, btnTrivia, 877, SpringLayout.WEST, contentPane);
+        spring.putConstraint(SpringLayout.NORTH, btnTrivia, 7, SpringLayout.SOUTH, postEditCanvas);
+    }
+
+    private void addStyles() {
+        btnToSave.setForeground(getSaveBtnColor());
+        btnAdvanceOptions.setForeground(getAdvanceBtnColor());
+        btnSurpriseMe.setForeground(getSurpriseBtnColor());
+
+        labTitle.setFont(getLabelTitleFont());
+        labOGImage.setFont(getImageLabelFont());
+        labOGImage.setForeground(getImageLabelColor());
+        labAFImage.setFont(getImageLabelFont());
+        labAFImage.setForeground(getImageLabelColor());
+
+        txtImageTitle.setFont(getImageTitleFont());
+        txtImageTitle.setForeground(getImageTitleColor());
+        txtImageTitle.setSize(450, 10);
+
+        txtTrivia.setOpaque(false);
+        txtTrivia.setBackground(Color.lightGray);
+        txtTrivia.setSize(350, 200);
+        txtTrivia.setWrapStyleWord(true);
+
+        txtImageTitle.setOpaque(false);
+        txtImageTitle.setBackground(Color.lightGray);
+    }
+
+    private void addToContentPane() {
+        contentPane.setLayout(spring);
+        contentPane.add(labTitle);
+        contentPane.add(labStep1);
+        contentPane.add(labOGImage);
+        contentPane.add(labStep2);
+        contentPane.add(labAFImage);
+        contentPane.add(txtImageTitle);
+        contentPane.add(labStep3);
+        contentPane.add(btnUploadImage);
+        contentPane.add(btnToDisPast);
+        contentPane.add(btnToPast);
+        contentPane.add(btnToDark);
+        contentPane.add(btnToSave);
+        contentPane.add(btnTutorial);
+        contentPane.add(btnExamples);
+        contentPane.add(btnBack2Present);
+        contentPane.add(btnAdvanceOptions);
+        contentPane.add(btnSurpriseMe);
+        contentPane.add(btnToFuture);
+        contentPane.add(btnToUnknown);
+        contentPane.add(btnBackToLast);
+        contentPane.add(btnTrivia);
+        contentPane.add(preEditCanvas);
+        contentPane.add(postEditCanvas);
+        contentPane.add(homeCanvas);
+        contentPane.add(txtTrivia);
+        contentPane.add(btnSelectFromWeb);
+    }
+
+    private void setupClickHandlers() {
+        btnUploadImage.addActionListener(this::actionPerformedUploadImage);
+        btnToDisPast.addActionListener(this::actionPerformedDisPast);
+        btnToPast.addActionListener(this::actionPerformedPast);
+        btnToDark.addActionListener(this::actionPerformedDark);
+        btnTutorial.addActionListener(this::actionPerformedTutorial);
+        btnExamples.addActionListener(this::actionPerformedExamples);
+        btnToSave.addActionListener(this::actionPerformedSave);
+        btnBack2Present.addActionListener(this::actionPerformedBackPresent);
+        btnAdvanceOptions.addActionListener(this::actionPerformedAdvanceOptions);
+        btnSurpriseMe.addActionListener(this::actionPerformedSurpriseME);
+        btnToFuture.addActionListener(this::actionPerformedFuture);
+        btnToUnknown.addActionListener(this::actionPerformedUnknown);
+        btnBackToLast.addActionListener(this::actionPerformedBackToLast);
+        btnTrivia.addActionListener(this::actionPerformedTrivia);
+        btnSelectFromWeb.addActionListener(this::actionPerformedSelectWeb);
+    }
+
+    private void configureJFrame() {
         frame.setSize(1000, 800);
         frame.setResizable(false);
         frame.setLocation(0, 0);
         frame.setBackground(Color.white);
         frame.setLayout(spring);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
-        preEditCanvas = new ImageCanvas(null);
-        preEditCanvas.setSize(450, 450);
+    private void setupHome() {
+        // set up UI components
+        frame.setVisible(true);//has to be placed at the end of setup
 
-        postEditCanvas = new ImageCanvas(null);
-        postEditCanvas.setSize(450, 450);
+        btnTrivia.setVisible(false);
 
-        homeCanvas = new ImageCanvas(null);
-        homeCanvas.setSize(900, 450);
-
-        button1_Select.addActionListener(new CustomButtonClickHandler1_SelectPhoto());
-        button2_ToDisPast.addActionListener(new CustomButtonClickHandler2_ToPast());
-        button3_ToPast.addActionListener(new CustomButtonClickHandler3_To1890());
-        button4_ToDark.addActionListener(new CustomButtonClickHandler4_ToDark());
-        button6_Tutorial.addActionListener(new CustomButtonClickHandler5_Tutorial());
-        button7_Examples.addActionListener(new CustomButtonClickHandler6_Examples());
-        button5_ToSave.addActionListener(new CustomButtonClickHandler7_ToSave());
-        button8_BackPresent.addActionListener(new CustomButtonClickHandler8_BackToPresent());
-        button9_AdvanceOptions.addActionListener(new CustomButtonClickHandler9_AdvanceOptions());
-        button10_SurpriseMe.addActionListener(new CustomButtonClickHandler10_SurpriseMe());
-        button11_ToFuture.addActionListener(new CustomButtonClickHandler11_ToFuture());
-        button12_ToUnknown.addActionListener(new CustomButtonClickHandler12_ToUnknown());
-        button13_BackToLast.addActionListener(new CustomButtonClickHandler13_BackToLast());
-        button14_Trivia.addActionListener(new CustomButtonClickHandler14_Trivia());
-
-        contentPane.setLayout(spring);
-        contentPane.add(label1_Title);
-        contentPane.add(label2_Step1);
-        contentPane.add(label3_OGImage);
-        contentPane.add(label4_Step2);
-        contentPane.add(label5_AFImage);
-        contentPane.add(text2_ImageTitle);
-        contentPane.add(label7_Step3);
-        contentPane.add(button1_Select);
-        contentPane.add(button2_ToDisPast);
-        contentPane.add(button3_ToPast);
-        contentPane.add(button4_ToDark);
-        contentPane.add(button5_ToSave);
-        contentPane.add(button6_Tutorial);
-        contentPane.add(button7_Examples);
-        contentPane.add(button8_BackPresent);
-        contentPane.add(button9_AdvanceOptions);
-        contentPane.add(button10_SurpriseMe);
-        contentPane.add(button11_ToFuture);
-        contentPane.add(button12_ToUnknown);
-        contentPane.add(button13_BackToLast);
-        contentPane.add(button14_Trivia);
-        contentPane.add(preEditCanvas);
-        contentPane.add(postEditCanvas);
-        contentPane.add(homeCanvas);
-        contentPane.add(text1_Trivia);
-
-        button5_ToSave.setForeground(new Color(126, 165, 242) );
-        button9_AdvanceOptions.setForeground(new Color(6, 155, 134) );
-        button10_SurpriseMe.setForeground(new Color(156, 65, 134) );
-
-        label1_Title.setFont(new Font("Serif", Font.PLAIN, 25));
-        label3_OGImage.setFont(new Font("Serif", Font.PLAIN, 10));
-        label3_OGImage.setForeground(new Color(111, 122, 143));
-        label5_AFImage.setFont(new Font("Serif", Font.PLAIN, 10));
-        label5_AFImage.setForeground(new Color(111, 122, 143));
-        text2_ImageTitle.setFont(new Font("Serif", Font.PLAIN, 18));
-        text2_ImageTitle.setForeground(new Color(11, 122, 143));
-        text2_ImageTitle.setSize(450, 10);
-
-        text1_Trivia.setOpaque(false);
-        text1_Trivia.setBackground(Color.lightGray);
-        text1_Trivia.setSize(350, 200);
-        text1_Trivia.setWrapStyleWord(true);
-        text2_ImageTitle.setOpaque(false);
-        text2_ImageTitle.setBackground(Color.lightGray);
-
-        spring.putConstraint(SpringLayout.WEST, label1_Title,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label1_Title,
-                10, SpringLayout.NORTH, contentPane);
-
-        spring.putConstraint(SpringLayout.WEST, button6_Tutorial,
-                100, SpringLayout.EAST, label1_Title);
-        spring.putConstraint(SpringLayout.NORTH, button6_Tutorial,
-                5, SpringLayout.NORTH, contentPane);
-
-        spring.putConstraint(SpringLayout.WEST, button7_Examples,
-                820, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button7_Examples,
-                30, SpringLayout.NORTH, button6_Tutorial);
-
-        spring.putConstraint(SpringLayout.WEST, preEditCanvas,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, preEditCanvas,
-                40, SpringLayout.SOUTH, label1_Title);
-
-        spring.putConstraint(SpringLayout.WEST, postEditCanvas,
-                450, SpringLayout.WEST, preEditCanvas);
-        spring.putConstraint(SpringLayout.NORTH, postEditCanvas,
-                40, SpringLayout.SOUTH, label1_Title);
-
-        spring.putConstraint(SpringLayout.WEST, homeCanvas,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, homeCanvas,
-                40, SpringLayout.SOUTH, label1_Title);
-
-        spring.putConstraint(SpringLayout.WEST, label3_OGImage,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label3_OGImage,
-                68, SpringLayout.NORTH, contentPane);
-
-        spring.putConstraint(SpringLayout.WEST, label4_Step2,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label4_Step2,
-                30, SpringLayout.SOUTH, label2_Step1);
-
-        spring.putConstraint(SpringLayout.WEST, label7_Step3,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label7_Step3,
-                60, SpringLayout.SOUTH, label4_Step2);
-
-        spring.putConstraint(SpringLayout.WEST, label5_AFImage,
-                725, SpringLayout.EAST, label3_OGImage);
-        spring.putConstraint(SpringLayout.NORTH, label5_AFImage,
-                68, SpringLayout.NORTH, contentPane);
-
-        spring.putConstraint(SpringLayout.WEST, text2_ImageTitle,
-                390, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, text2_ImageTitle,
-                7, SpringLayout.SOUTH, preEditCanvas);
-
-        spring.putConstraint(SpringLayout.WEST, text1_Trivia,
-                500, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, text1_Trivia,
-                7, SpringLayout.SOUTH, text2_ImageTitle);
-
-        spring.putConstraint(SpringLayout.WEST, label2_Step1,
-                50, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, label2_Step1,
-                80, SpringLayout.SOUTH, preEditCanvas);
-
-        spring.putConstraint(SpringLayout.WEST, button1_Select,
-                240, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button1_Select,
-                76, SpringLayout.SOUTH, preEditCanvas);
-
-        spring.putConstraint(SpringLayout.WEST, button2_ToDisPast,
-                240, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button2_ToDisPast,
-                15, SpringLayout.SOUTH, button1_Select);
-
-        spring.putConstraint(SpringLayout.WEST, button3_ToPast,
-                405, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button3_ToPast,
-                15, SpringLayout.SOUTH, button1_Select);
-
-        spring.putConstraint(SpringLayout.WEST, button4_ToDark,
-                515, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button4_ToDark,
-                15, SpringLayout.SOUTH, button1_Select);
-
-        spring.putConstraint(SpringLayout.WEST, button11_ToFuture,
-                665, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button11_ToFuture,
-                15, SpringLayout.SOUTH, button1_Select);
-
-        spring.putConstraint(SpringLayout.WEST, button12_ToUnknown,
-                800, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button12_ToUnknown,
-                15, SpringLayout.SOUTH, button1_Select);
-
-        spring.putConstraint(SpringLayout.WEST, button5_ToSave,
-                240, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button5_ToSave,
-                56, SpringLayout.SOUTH, label4_Step2);
-
-        spring.putConstraint(SpringLayout.WEST, button8_BackPresent,
-                240, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button8_BackPresent,
-                10, SpringLayout.SOUTH, button2_ToDisPast);
-
-        spring.putConstraint(SpringLayout.WEST, button9_AdvanceOptions,
-                170, SpringLayout.WEST, button8_BackPresent);
-        spring.putConstraint(SpringLayout.NORTH, button9_AdvanceOptions,
-                10, SpringLayout.SOUTH, button2_ToDisPast);
-
-        spring.putConstraint(SpringLayout.WEST, button10_SurpriseMe,
-                170, SpringLayout.WEST, button9_AdvanceOptions);
-        spring.putConstraint(SpringLayout.NORTH, button10_SurpriseMe,
-                10, SpringLayout.SOUTH, button2_ToDisPast);
-
-        spring.putConstraint(SpringLayout.WEST, button13_BackToLast,
-                130, SpringLayout.WEST, button10_SurpriseMe);
-        spring.putConstraint(SpringLayout.NORTH, button13_BackToLast,
-                10, SpringLayout.SOUTH, button2_ToDisPast);
-
-        spring.putConstraint(SpringLayout.WEST, button14_Trivia,
-                390, SpringLayout.WEST, contentPane);
-        spring.putConstraint(SpringLayout.NORTH, button14_Trivia,
-                7, SpringLayout.SOUTH, text2_ImageTitle);
-
-        button14_Trivia.setVisible(false);
-        frame.setVisible(true);
-
-        BufferedImage homeImage = null;
-        try {
-            homeImage = ImageIO.read(new File("cats2.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        homeImage = scaleImage(homeImage, 900, 450);
-        homeCanvas.setImage(homeImage);
+        homeCanvas.setImage(imageManager.getHomeImage());
         homeCanvas.repaint();
         homeCanvas.setVisible(true);
+
         preEditCanvas.setVisible(false);
         postEditCanvas.setVisible(false);
-        text2_ImageTitle.setVisible(false);
+        txtImageTitle.setVisible(false);
+        frame.setVisible(true);//has to be placed at the end of setup
     }
 
-    private void imageLoading() throws IOException {
-        if ( numOfEdits > 0 ) {
-            if (warning() == 0) {
-                return;
-            }
-        }
-        text1_Trivia.setVisible(false);
+    private void uploadImage() {
+        //upload image from user's device
+        txtTrivia.setVisible(false);
         fileDialog.setVisible(true);
-
-        if (fileDialog.getFile() != null) {
-
+        if (fileDialog.getFile() != null) //user didn't choose cancel
+        {
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
-            button14_Trivia.setVisible(false);
-
-            try {
-                masterImage = ImageIO.read(new File(d));
-                currentImage = masterImage;
-
-                stack = new ImageStack();
-                stack.addToStack(currentImage, "The Present");
-
-                editImage = scaleImage(currentImage, 450, 450);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "This photo doesn't work. Choose another one.",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            preEditCanvas.setImage(editImage);
-            preEditCanvas.repaint();
-            BufferedImage blank_image = ImageIO.read(new File("blank_image.png"));
-
-            postEditCanvas.setImage(blank_image);
-            postEditCanvas.repaint();
-            homeCanvas.setVisible(false);
-            preEditCanvas.setVisible(true);
-            postEditCanvas.setVisible(true);
-            text2_ImageTitle.setVisible(false);
-            label2_Step1.setText("Step 1: Select another photo: ");
-            numOfEdits = 0;
-        }
-    }
-
-    public class CustomButtonClickHandler1_SelectPhoto implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try{
-                imageLoading();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please ensure compliance!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    public class CustomButtonClickHandler2_ToPast implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-            try {
-                currentImage = toGrayScale(currentImage);
-                displayImage();
-            } catch (Exception ex) {
-                text2_ImageTitle.setVisible(false);
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-
-    public class CustomButtonClickHandler3_To1890 implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-            try {
-                currentImage = toSepia(currentImage, 10);
-                displayImage();
-            } catch (Exception ex) {
-
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-
-    public class CustomButtonClickHandler4_ToDark implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-            try {
-                currentImage = toBlue(currentImage);
-                currentImage = toSepia(currentImage, 10);
-                displayImage();
-            } catch (Exception ex) {
-
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-
-    public class CustomButtonClickHandler5_Tutorial implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BufferedImage image = null;
-            try {
-                image = ImageIO.read(new File("tutorial.png"));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            JLabel picLabel = new JLabel(new ImageIcon(image));
-            JOptionPane.showMessageDialog(null, picLabel, "Tutorial",
-                    JOptionPane.PLAIN_MESSAGE, null);
-
-        }
-    }
-
-    public class CustomButtonClickHandler6_Examples implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            BufferedImage image = null;
-            try {
-                image = ImageIO.read(new File("filterExamples.png"));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            JLabel picLabel = new JLabel(new ImageIcon(image));
-            JOptionPane.showMessageDialog(null, picLabel,
-                    "Filter Examples", JOptionPane.PLAIN_MESSAGE, null);
-        }
-    }
-
-    public class CustomButtonClickHandler7_ToSave implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (currentImage == null) {
-                JOptionPane.showMessageDialog(frame, "No image to save!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            try {
-                //dropdown menu for saved file formats
-                JFileChooser fileChooser = new JFileChooser();
-                FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
-                fileChooser.addChoosableFileFilter(pngFilter);
-                fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg"));
-
-                fileChooser.setFileFilter(pngFilter); // Default value of the dropdown menu: PNG
-
-                int returnVal = fileChooser.showSaveDialog(null); //get user input "save" or "cancel"
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) { //user input chooses "save"
-                    File file = fileChooser.getSelectedFile();
-
-                    FileNameExtensionFilter currentFilter = (FileNameExtensionFilter) fileChooser.getFileFilter();
-                    String ext = currentFilter.getExtensions()[0];
-
-                    //append image title to file name
-                    String fileName = file.getName() + "_" + stack.getStack().peek().getTitle();
-                    file = new File(file.getParent(), fileName + "." + ext);
-
-                    if (!currentFilter.accept(file))
-                    {
-                        // File does not have the correct extension, fix it
-                        fileName = file.getName();
-                        file = new File(file.getParent(), fileName + "." + ext);
-                    }
-
-                    String format = "jpg".equals(ext) ? "JPEG" : ext;
-                    ImageIO.write(currentImage, format, file);
-
-                }
-
-            } catch(Exception ex) {
-                    JOptionPane.showMessageDialog(frame, "Image not saved, choose another format!",
-                            "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                    ex.printStackTrace();
-            }
-            numOfEdits = 0;
-        }
-
-    }
-
-
-
-    public class CustomButtonClickHandler8_BackToPresent implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if ( numOfEdits > 0) {
-                if (warning() == 0) {
-                    return;
-                }
-            }
-            if(currentImage == null) {
-                JOptionPane.showMessageDialog(frame,
-                        "No image to sent back to the present, please upload an image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            currentImage = masterImage;
-            displayImage();
-            text2_ImageTitle.setText("                  Back to the Present");
-            text2_ImageTitle.setVisible(true);
-            text1_Trivia.setVisible(false);
-            stack = new ImageStack();
-            stack.addToStack(currentImage, "The Present");
-            numOfEdits = 0;
-        }
-    }
-
-    public class CustomButtonClickHandler9_AdvanceOptions implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-            if(currentImage == null) {
-                JOptionPane.showMessageDialog(frame, "No image to crop, please upload an image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            String anchor = getCropData();
-            if (anchor == null) {
-                return;
-            }
-            else {
-                currentImage = cropImage(anchor, currentImage);
-                String translation = stack.getStack().peek().getTranslation();
-                stack.addToStack(currentImage, stack.getStack().peek().getTitle());
-                stack.getStack().peek().setTrivia(translation);
-                displayImage();
-                numOfEdits++;
-            }
-        }
-    }
-
-    public class CustomButtonClickHandler10_SurpriseMe implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-            try{
-                currentImage = masterImage;
-                currentImage = surpriseMe(currentImage);
-                displayImage();
-            }catch (Exception ex) {
-
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-
-    public class CustomButtonClickHandler11_ToFuture implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-
-            try{
-                currentImage = toNeon(currentImage);
-                displayImage();
-            }catch (Exception ex) {
-
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-
-    public class CustomButtonClickHandler12_ToUnknown implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            text1_Trivia.setVisible(false);
-            try{
-                currentImage = toNegative(currentImage);
-                displayImage();
-            }catch (Exception ex) {
-
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Please upload your image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            addStackAndTitle();
-            numOfEdits++;
-        }
-    }
-    public class CustomButtonClickHandler13_BackToLast implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if (stack.getStack().size() == 0) {
-                JOptionPane.showMessageDialog(frame, "Please upload an image!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            if (stack.getStack().size() == 1) {
-                JOptionPane.showMessageDialog(frame, "Can't go back anymore!",
-                        "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            else {
-                stack.getStack().pop();
-                numOfEdits --;
-            }
-            currentImage = stack.getStack().peek().getImage();
-            displayImage();
-
-            String result = stack.getStack().peek().getTitle();
-            text2_ImageTitle.setText("Traveled to: " + result);
-            if (stack.getStack().peek().getTranslation() != null) {
-                text1_Trivia.setText(stack.getStack().peek().getTranslation());
-                text1_Trivia.setVisible(true);
-            }
-            else {
-                text1_Trivia.setVisible(false);
-            }
-            text2_ImageTitle.setVisible(true);
-        }
-    }
-    public class CustomButtonClickHandler14_Trivia implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            try
+            BufferedImage tempImage = imageManager.getImageResource().fileToImage(d);
+            if (tempImage != null)
             {
-                getFactService(null);
-                //String result = serviceConnection.sendMessage("raining tacos");
-                //System.out.print(result);
-
-                //getTriviaService();
-
-            } catch (IOException ex)
+                btnTrivia.setVisible(false);
+                imageManager.setMasterImage(tempImage);
+                displayNewImage();
+            } else
             {
-                ex.printStackTrace();
+                errorMessage(null, 4); //tempImage == null, format not accepted
             }
         }
     }
-    public void displayImage() {
-        editImage = scaleImage(currentImage, 450, 450);
-        postEditCanvas.setImage(editImage);
+
+    private void displayNewImage() {
+        // setup when a new image is uploaded
+        imageManager.processNewImage();
+
+        preEditCanvas.setImage(scaleImage(imageManager.getCurrentImage(), 450, 450));
+        preEditCanvas.repaint();
+        postEditCanvas.setImage(imageManager.getBlankImage()); //blank image is the right size, scaling not necessary
+
+        postEditCanvas.repaint();
+        homeCanvas.setVisible(false);
+        preEditCanvas.setVisible(true);
+        postEditCanvas.setVisible(true);
+        txtImageTitle.setVisible(false);
+        labStep1.setText("Step 1: Select another photo: ");
+    }
+
+    private void toDisPast() {
+        // Button "To the Distant Past" logic
+        imageManager.setCurrentImage(toGrayScale(imageManager.getCurrentImage()));
+        displayImage();
+    }
+
+
+    private void toPast() {
+        // Button "To the Past" logic
+        imageManager.setCurrentImage(toSepia(imageManager.getCurrentImage(), 10));
+        displayImage();
+
+    }
+
+    private void toDark() {
+        // Button "To the Dark Age" logic
+        imageManager.setCurrentImage(toBlue(imageManager.getCurrentImage()));
+        imageManager.setCurrentImage(toSepia(imageManager.getCurrentImage(), 10));
+        displayImage();
+    }
+
+    private void displayTutorial() {
+        // Button "Tutorial" logic
+        JLabel picLabel = new JLabel(new ImageIcon(imageManager.getTutorialImage()));
+        JOptionPane.showMessageDialog(null, picLabel, "Tutorial",
+                JOptionPane.PLAIN_MESSAGE, null);
+    }
+
+    private void displayExamples() {
+        // Button "Examples" logic
+        JLabel picLabel = new JLabel(new ImageIcon(imageManager.getExampleImage()));
+        JOptionPane.showMessageDialog(null, picLabel,
+                "Filter Examples", JOptionPane.PLAIN_MESSAGE, null);
+    }
+
+    private void toSave() {
+        // Button "Save Image" logic
+        JFileChooser fileChooser = makeFileChooser();
+
+        int returnVal = fileChooser.showSaveDialog(null); //get user input "save" or "cancel"
+
+        if (returnVal == JFileChooser.APPROVE_OPTION)
+        { //if the user chooses "save"
+             if (!fileUtil.saveFile(fileChooser, imageManager)) {
+                 errorMessage(null, 3);
+             }
+             else {
+                 imageManager.resetNumOfEdits();
+             }
+        }
+    }
+
+
+
+    private JFileChooser makeFileChooser() {
+        //dropdown menu for saved file formats
+        JFileChooser fileChooser = new JFileChooser();
+        FileNameExtensionFilter pngFilter = new FileNameExtensionFilter("PNG File", "png");
+        fileChooser.addChoosableFileFilter(pngFilter);
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("JPEG File", "jpg"));
+        fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("GIF File", "gif"));
+
+        fileChooser.setFileFilter(pngFilter); // Default value of the dropdown menu: PNG
+        fileChooser.setAcceptAllFileFilterUsed(false); //disable "all file"options
+        return fileChooser;
+    }
+
+    private void toBackPresent() {
+        // Button "Back to Present" logic
+        imageManager.processNewImage();
+        displayImage();
+        txtImageTitle.setText("                  Back to the Present");
+        txtImageTitle.setVisible(true);
+        txtTrivia.setVisible(false);
+    }
+
+    private void advanceOptions() {
+        // Button "Advance Options" logic
+        String anchor = getCropData();
+        if (anchor != null)
+        {
+            imageManager.setCurrentImage(cropImage(anchor, imageManager.getCurrentImage()));
+            imageManager.addToStack(imageManager.getImageHistory().getStack().peek().getTitle());
+            imageManager.getImageHistory().addTrivia(imageManager.getImageHistory().getStack().peek().getTrivia());
+            displayImage();
+            imageManager.getImageHistory().incrementEdits();
+        }
+    }
+
+    private void toSurpriseMe() {
+        // Button "Surprise Me" logic
+        imageManager.masterToCurrent();
+        imageManager.setCurrentImage(surpriseMe(imageManager.getCurrentImage()));
+        displayImage();
+    }
+
+    private void toFuture() {
+        // Button "To the Future" logic
+        imageManager.setCurrentImage(toNeon(imageManager.getCurrentImage()));
+        displayImage();
+    }
+
+    private void toUnknown() {
+        // Button "To the Unknown" logic
+        imageManager.setCurrentImage(toNegative(imageManager.getCurrentImage()));
+        displayImage();
+
+    }
+
+    private void toBackToLast() {
+        // Button "Back to the previous time period" logic
+        imageManager.getImageHistory().popAStack();
+        imageManager.setCurrentImage(imageManager.getImageHistory().getStack().peek().getImage());
+        displayImage();
+
+        txtImageTitle.setText("Traveled to: " + imageManager.getImageHistory().getStack().peek().getTitle());
+        if (imageManager.getImageHistory().getStack().peek().getTrivia() != null)
+        {
+            txtTrivia.setText(imageManager.getImageHistory().getStack().peek().getTrivia());
+            txtTrivia.setVisible(true);
+        } else
+        {
+            txtTrivia.setVisible(false);
+        }
+        txtImageTitle.setVisible(true);
+    }
+
+    private void displayImage() {
+        postEditCanvas.setImage(scaleImage(imageManager.getCurrentImage(), 450, 450));
         postEditCanvas.repaint();
     }
 
 
 
-    public String getTriviaService() throws IOException {
-
-        String response = (obj.sendGETSync(stack.getStack().peek().getTitle(), 3));
-        System.out.println(response);//yufyvuvhvhy //rubber duck
-        String[] titleList = {"RandomWord_1","RandomWord_2","RandomWord_3","RandomWord_4",
-                "RandomWord_5","RandomWord_6","RandomWord_7","RandomWord_8",
-                "RandomWord_9","RandomWord_10","RandomWord_11","RandomWord_12"};
-        String result = titleList[(int) ((Math.random() * (12 - 1)) + 1)];
-
-        return result;
+    private void socketService() throws IOException {
+        ImageServiceClient serviceConnection = new ImageServiceClient();
+        serviceConnection.startConnection("127.0.0.1", 4444);
+        okHttp.sendGETSync(imageManager.getImageHistory().getStack().peek().getTitle(), 4);
+        String result = serviceConnection.sendMessage("raining tacos");
+        System.out.print(result);
     }
 
-    public String getWordService(String word) throws IOException {
-        String response = (obj.sendGETSync(word, 1));
+    private void imageFromTitleService() throws IOException {
+        String result = okHttp.sendGETSync(imageManager.getImageHistory().getStack().peek().getTitle(), 4);
+        System.out.print(result);
+    }
+
+    private String timePeriodService(String word) throws IOException {
+        String response = (okHttp.sendGETSync(word, 1));
         System.out.println(response);
-        text2_ImageTitle.setText("Traveled to: " + response);
-        text2_ImageTitle.setVisible(true);
-        button14_Trivia.setVisible(true);
+        txtImageTitle.setText("Traveled to: " + response);
+        txtImageTitle.setVisible(true);
+        btnTrivia.setVisible(true);
         return response;
     }
 
-    public String getFactService(String word) throws IOException {
-        String response = (obj.sendGETSync(word, 2));
-        System.out.println(response);
-        text1_Trivia.setText(response);
-        text1_Trivia.setLineWrap(true);
-        text1_Trivia.setVisible(true);
-        stack.getStack().peek().setTrivia(response);
-        return response;
+    private void triviaService(String word) {
+        String response = null;
+        try
+        {
+            response = (okHttp.sendGETSync(word, 2));
+        } catch (IOException ex)
+        {
+            ex.printStackTrace();
+        }
+        txtTrivia.setText(response);
+        txtTrivia.setLineWrap(true);
+        txtTrivia.setVisible(true);
+        imageManager.getImageHistory().getStack().peek().setTrivia(response);
     }
 
-    public int warning() {
+    private void imageFromWebService() {
+        try
+        {
+            String searchTerm = JOptionPane.showInputDialog("Enter a search term for image searching: ");
+            if (searchTerm == null) //User pressed CANCEL
+            {
+                return;
+            }
+            String response = (okHttp.sendGETSync(searchTerm, 3));
+            System.out.println(response);
+            imageManager.setMasterImage(ImageIO.read(new URL(response)));
+            displayNewImage();
+        } catch (IOException ex)
+        {
+            errorMessage(ex, 2);
+            imageFromWebService();
+        }
+    }
+
+    private void errorMessage(Exception ex, int type) {
+        String message = "";
+        if (ex != null)
+        {
+            ex.printStackTrace();
+        }
+        switch (type)
+        {
+            case 0:
+                message = "Please upload an image.";
+                break;
+            case 1:
+                message = "Can't go back anymore!";
+                break;
+            case 2:
+                message = "This search term doesn't work.";
+                break;
+            case 3:
+                message = "Error, image is not saved.";
+                break;
+            case 4:
+                message = "This photo doesn't work. Please select another one.";
+                break;
+            default:
+                break;
+        }
+        JOptionPane.showMessageDialog(frame, message, "Image TiMeMaChInE", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private int warning() {
         Object[] options = {"Cancel", "Yes, continue without saving"};
-        int n = JOptionPane.showOptionDialog(frame,
+        return JOptionPane.showOptionDialog(frame,
                 "You haven't saved your photo's time travel journey. Still want to continue?",
                 "Warning - You haven't saved your image",
                 JOptionPane.YES_NO_CANCEL_OPTION,
@@ -689,28 +512,140 @@ public class UI {
                 null,
                 options,
                 options[0]);
-        return n;
     }
 
-    public String getCropData() {
+    private String getCropData() {
         Object[] possibilities = {"Center", "North", "East", "West", "South",
                 "Northeast", "Northwest", "Southeast", "Southwest"};
-        String selection = (String) JOptionPane.showInputDialog(
+        return (String) JOptionPane.showInputDialog(
                 frame,
-                "Choose an anchor to crop your image :\n",
+                "Choose an anchor to crop your image :        \n",
                 "Grid Anchor Based Image Cropping",
                 JOptionPane.PLAIN_MESSAGE, null, possibilities, "Center");
-        return selection;
     }
 
-    public void addStackAndTitle() {
-        try {
-            imageTitle = getWordService(null);
-            stack.addToStack(currentImage, imageTitle);
+    private void addStackAndTitle() {
+        try
+        {
+            String imageTitle = timePeriodService(null);
+            imageManager.addToStack(imageTitle);
         } catch (IOException ex)
         {
             ex.printStackTrace();
         }
     }
 
+    private boolean proceedWithoutSaving() {
+        return !(imageManager.hasUnsavedProcess() && warning() == 0); // warning() != 0 : proceed
+    }
+
+    private boolean hasImage() {
+        if (imageManager.isCurrentNull())
+        {
+            errorMessage(null, 0);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isHistoryEmpty() {
+        int errorCode = imageManager.getImageHistory().isStackEmpty();
+        if (errorCode == 0 || errorCode == 1 ) {
+            errorMessage(null, errorCode);
+            return true;
+        }
+        return false;
+    }
+
+
+    private void actionPerformedUploadImage(ActionEvent e) {
+        if (proceedWithoutSaving())
+        {
+            uploadImage();
+        }
+    }
+
+    private void actionPerformedDisPast(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toDisPast();
+        addStackAndTitle();
+    }
+
+    private void actionPerformedPast(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toPast();
+        addStackAndTitle();
+    }
+
+    private void actionPerformedDark(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toDark();
+        addStackAndTitle();
+    }
+
+    private void actionPerformedTutorial(ActionEvent e) {
+        displayTutorial();
+    }
+
+    private void actionPerformedExamples(ActionEvent e) {
+        displayExamples();
+    }
+
+    private void actionPerformedSave(ActionEvent e) {
+        if (hasImage()) {
+            toSave();
+        }
+    }
+
+    private void actionPerformedBackPresent(ActionEvent e) {
+        if (proceedWithoutSaving() && hasImage())
+        {
+            toBackPresent();
+        }
+    }
+
+    private void actionPerformedAdvanceOptions(ActionEvent e) {
+        if (hasImage())
+        {
+            advanceOptions();
+        }
+    }
+
+    private void actionPerformedSurpriseME(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toSurpriseMe();
+        addStackAndTitle();
+    }
+
+    private void actionPerformedFuture(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toFuture();
+        addStackAndTitle();
+
+    }
+
+    private void actionPerformedUnknown(ActionEvent e) {
+        txtTrivia.setVisible(false);
+        toUnknown();
+        addStackAndTitle();
+
+    }
+
+    private void actionPerformedBackToLast(ActionEvent e) {
+        if (!isHistoryEmpty())
+        {
+            toBackToLast();
+        }
+    }
+
+    private void actionPerformedTrivia(ActionEvent e) {
+        triviaService(null);
+    }
+
+    private void actionPerformedSelectWeb(ActionEvent e) {
+        if (proceedWithoutSaving())
+        {
+            imageFromWebService();
+        }
+    }
 }

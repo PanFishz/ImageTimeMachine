@@ -1,13 +1,14 @@
-package ImageTimeMachine.model;
+package ImageTimeMachine.model.editingTools;
 
-public class NeonMore extends Filter{
+
+public class NeonMore extends Filter {
     public NeonMore() {
         super(FilterType.NEON_MORE);
     }
     @Override
     public int calculatingRGB(int a, int r, int g, int b, int p) {
         g = (p >> 18) & 0xff;
-        if ((p & 0x00FFFFFF) >= 0 && (p & 0x00FFFFFF) <= 3900050) {
+        if ((p & 0x00FFFFFF) <= 3900050) {
             return -1;
         }
 
