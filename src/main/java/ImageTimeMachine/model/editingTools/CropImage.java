@@ -5,7 +5,12 @@ import java.awt.image.BufferedImage;
 
 public class CropImage extends Transformer {
     private final FilterType filterType;
-    private String option = "center";;
+    private String option = "center";
+    private int imageWidth;
+    private int imageHeight;
+    private int newWidth;
+    private int newHeight;
+    private int xCoordinate, yCoordinate;
 
     public CropImage() {
         filterType = FilterType.CROPPING;
@@ -22,12 +27,25 @@ public class CropImage extends Transformer {
 
     @Override
     public BufferedImage processEditing(BufferedImage image) {
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-        int newWidth = (int) (imageWidth * 0.8);
-        int newHeight = (int) (imageHeight * 0.8);
-        int xCoordinate, yCoordinate;
+        setNewWidHgt(image);
+        setNewCoordinates();
 
+        BufferedImage img = image.getSubimage(xCoordinate, yCoordinate,
+                newWidth, newHeight);//fill in the corners of the desired crop location here
+        BufferedImage copyOfImage = makeNewImage(newWidth, newHeight);
+        Graphics g = copyOfImage.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        return copyOfImage;
+    }
+
+    private void setNewWidHgt(BufferedImage image) {
+        imageWidth = image.getWidth();
+        imageHeight = image.getHeight();
+        newWidth = (int) (imageWidth * 0.8);
+        newHeight = (int) (imageHeight * 0.8);
+    }
+
+    private void setNewCoordinates() {
         switch (option) {
             case "North":
                 xCoordinate = (imageWidth - newWidth) / 2;
@@ -35,11 +53,11 @@ public class CropImage extends Transformer {
                 break;
             case "East":
                 xCoordinate = (imageWidth - newWidth);
-                yCoordinate = (imageHeight  - newHeight) / 2;
+                yCoordinate = (imageHeight - newHeight) / 2;
                 break;
             case "West":
                 xCoordinate = 0;
-                yCoordinate = (imageHeight  - newHeight) / 2;
+                yCoordinate = (imageHeight - newHeight) / 2;
                 break;
             case "South":
                 xCoordinate = (imageWidth - newWidth) / 2;
@@ -59,22 +77,13 @@ public class CropImage extends Transformer {
                 break;
             case "Southwest":
                 xCoordinate = 0;
-                yCoordinate = (imageHeight  - newHeight);
+                yCoordinate = (imageHeight - newHeight);
                 break;
             case "Center":
             default:
                 xCoordinate = (imageWidth - newWidth) / 2;
-                yCoordinate = (imageHeight  - newHeight) / 2;
+                yCoordinate = (imageHeight - newHeight) / 2;
                 break;
         }
-
-        BufferedImage img = image.getSubimage(xCoordinate, yCoordinate,
-                newWidth, newHeight);//fill in the corners of the desired crop location here
-        BufferedImage copyOfImage = makeNewImage(newWidth, newHeight);
-        Graphics g = copyOfImage.createGraphics();
-        g.drawImage(img, 0, 0, null);
-        return copyOfImage;
     }
-
-
 }

@@ -22,27 +22,28 @@ public class Sepia extends Filter {
         r = r + (sepiaDepth * 2);
         g = g + sepiaDepth;
 
-        if (r > 255) {
-            r = 255;
-        }
-        if (g > 255) {
-            g = 255;
-        }
-        if (b > 255) {
-            b = 255;
-        }
+        r = normalizedRedGreen(r);
 
-        // Darken blue color to increase sepia effect
-        b -= sepiaIntensity;
+        g = normalizedRedGreen(g);
 
-        // normalize if out of bounds
-        if (b < 0) {
-            b = 0;
-        }
-        if (b > 255) {
-            b = 255;
-        }
+        b = normalizedBlue(b);
+
         return (a << 24) | (r << 16) | (g << 8) | b;
 
+    }
+
+    private int normalizedRedGreen(int value) {
+        if (value > 255) {
+            return 255;
+        }
+        return value;
+    }
+
+    private int normalizedBlue(int value) {
+        value = normalizedRedGreen(value) - sepiaIntensity;
+        if (value < 0) {
+            return 0;
+        }
+        return normalizedRedGreen(value);
     }
 }

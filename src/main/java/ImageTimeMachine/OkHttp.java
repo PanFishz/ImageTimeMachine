@@ -6,6 +6,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+
 import org.json.*;
 
 
@@ -24,15 +25,12 @@ public class OkHttp {
     private Request buildRequest(String word, int option) {
         if (option == 1) {
             return new Request.Builder().url("https://17cranes.com/randomPeriod/").build();
-        }
-        else if (option == 2) {
+        } else if (option == 2) {
             return new Request.Builder().url("https://historical-random-facts-api.herokuapp.com/").build();
-        }
-        else if (option == 3) {
+        } else if (option == 3) {
             return new Request.Builder().url("https://image-service-cs361.herokuapp.com/image?searchTerm="
                     + word).build();
-        }
-        else {
+        } else {
             return new Request.Builder().url(getGoogleApi(word)).build();
         }
     }
@@ -53,12 +51,9 @@ public class OkHttp {
         JSONObject jsonObject = new JSONObject(reply);
         if (option == 1) {
             return jsonObject.getString("timePeriod");
-        }
-        else if (option == 2)
-        {
+        } else if (option == 2) {
             return jsonObject.getString("fact");
-        }
-        else {
+        } else {
             printImageUrls(jsonObject);
             return jsonObject.get("items").toString();
         }
@@ -78,8 +73,7 @@ public class OkHttp {
                 .getJSONObject(0).getString("searchTerms");
         System.out.println("searchTerm: " + searchTerm);
         JSONArray arr = jo.getJSONArray("items");
-        for (int i = 0; i < arr.length(); i++)
-        {
+        for (int i = 0; i < arr.length(); i++) {
             String links = arr.getJSONObject(i).getString("link");
             System.out.println(links);
         }

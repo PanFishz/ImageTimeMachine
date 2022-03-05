@@ -18,7 +18,7 @@ public class EditingControlPanel {
     private static NeonMore neonMoreFilter = new NeonMore();
     private static Red redFilter = new Red();
     private static final Sepia sepiaFilter = new Sepia();
-    private static final ensureOpaqueFree opaqueFree= new ensureOpaqueFree();
+    private static final ensureOpaqueFree opaqueFree = new ensureOpaqueFree();
     private static final ArrayList<Transformer> toollist = new ArrayList<>();
 
     public static void makeList() {
@@ -34,6 +34,7 @@ public class EditingControlPanel {
         sepiaFilter2.setSepiaIntensity(90);
         toollist.add(sepiaFilter2);
     }
+
     public static BufferedImage opaqueFree(BufferedImage sourceImage) {
         return opaqueFree.opaqueFree(sourceImage);
     }
@@ -93,7 +94,7 @@ public class EditingControlPanel {
         int upperbound = 9;
         int randomNumber = rand.nextInt(2);
         int randomFilter;
-        for (int i = 0; i < randomNumber + 1; i ++) {
+        for (int i = 0; i < randomNumber + 1; i++) {
             randomFilter = rand.nextInt(upperbound);
             switch (randomFilter) {
                 case 0:
@@ -106,7 +107,7 @@ public class EditingControlPanel {
                     image = toNeon(image);
                     break;
                 case 3:
-                    image =toNeonMore(image);
+                    image = toNeonMore(image);
                     break;
                 case 4:
                     image = toRed(image);

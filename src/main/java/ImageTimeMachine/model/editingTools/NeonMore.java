@@ -5,6 +5,7 @@ public class NeonMore extends Filter {
     public NeonMore() {
         super(FilterType.NEON_MORE);
     }
+
     @Override
     public int calculatingRGB(int a, int r, int g, int b, int p) {
         g = (p >> 18) & 0xff;

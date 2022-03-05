@@ -10,6 +10,7 @@ public class ImageStack {
     public ImageStack() {
         stack = new Stack<>();
     }
+
     public Stack<ImageTitleTrivia> getStack() {
         return stack;
     }
@@ -22,6 +23,7 @@ public class ImageStack {
         }
         stack.push(imageTitlePair);
     }
+
     public ImageTitleTrivia peek() {
         return stack.peek();
     }

@@ -1,4 +1,5 @@
 package ImageTimeMachine.model.style;
+
 import java.awt.Color;
 
 public class ColorPicker {

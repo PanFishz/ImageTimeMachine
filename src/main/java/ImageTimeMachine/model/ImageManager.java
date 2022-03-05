@@ -1,4 +1,5 @@
 package ImageTimeMachine.model;
+
 import java.awt.image.BufferedImage;
 
 public class ImageManager {
@@ -17,6 +18,7 @@ public class ImageManager {
     public BufferedImage getCurrentImage() {
         return currentImage;
     }
+
     public ImageResource getImageResource() {
         return imageResource;
     }
@@ -32,6 +34,7 @@ public class ImageManager {
     public void setMasterImage(BufferedImage image) {
         masterImage = image;
     }
+
     public void masterToCurrent() {
         currentImage = masterImage;
     }
@@ -43,6 +46,7 @@ public class ImageManager {
     public void resetStack() {
         imageHistory.resetStack();
     }
+
     public void resetNumOfEdits() {
         imageHistory.resetEdits();
     }
@@ -50,8 +54,7 @@ public class ImageManager {
     public void addToStack(String title) {
         if (title == null) {
             imageHistory.addToStack(currentImage, "The Present");
-        }
-        else {
+        } else {
             imageHistory.addToStack(currentImage, title);
             imageHistory.incrementEdits();
         }
@@ -60,12 +63,15 @@ public class ImageManager {
     public BufferedImage getHomeImage() {
         return imageResource.homeImage();
     }
+
     public BufferedImage getBlankImage() {
         return imageResource.blankImage();
     }
+
     public BufferedImage getTutorialImage() {
         return imageResource.tutorialImage();
     }
+
     public BufferedImage getExampleImage() {
         return imageResource.exampleImage();
     }

@@ -20,7 +20,7 @@ public class ImageHistory {
     }
 
     public void incrementEdits() {
-        numbOfEdits ++;
+        numbOfEdits++;
     }
 
     public void resetEdits() {
@@ -38,6 +38,7 @@ public class ImageHistory {
     public void addTrivia(String trivia) {
         stack.peek().setTrivia(trivia);
     }
+
     public int isStackEmpty() {
         int stackSize = stack.getStack().size();
         if (stackSize == 1 || stackSize == 0) {
@@ -45,8 +46,9 @@ public class ImageHistory {
         }
         return -1;
     }
+
     public void popAStack() {
         stack.getStack().pop();
-        numbOfEdits --;
+        numbOfEdits--;
     }
 }

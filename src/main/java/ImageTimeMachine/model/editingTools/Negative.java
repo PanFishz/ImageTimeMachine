@@ -12,7 +12,6 @@ public class Negative extends Filter {
         g = 255 - g;
         b = 255 - b;
 
-        // set new RGB value
-        return   (a << 24) | (r << 16) | (g << 8) | b;
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 }

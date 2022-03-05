@@ -4,6 +4,7 @@ public class Neon extends Filter {
     public Neon() {
         super(FilterType.NEON);
     }
+
     @Override
     public int calculatingRGB(int a, int r, int g, int b, int p) {
         g = (p >> 18) & 0xff;
@@ -16,6 +17,6 @@ public class Neon extends Filter {
         g = 255 - g + b;
         b = 255 - b + r;
 
-       return (a << 24) | (r << 16) | (g << 8) | b;
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 }

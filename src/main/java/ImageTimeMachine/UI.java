@@ -255,13 +255,11 @@ public class UI {
         {
             String d = (fileDialog.getDirectory() + fileDialog.getFile());
             BufferedImage tempImage = imageManager.getImageResource().fileToImage(d);
-            if (tempImage != null)
-            {
+            if (tempImage != null) {
                 btnTrivia.setVisible(false);
                 imageManager.setMasterImage(tempImage);
                 displayNewImage();
-            } else
-            {
+            } else {
                 errorMessage(null, 4); //tempImage == null, format not accepted
             }
         }
@@ -324,17 +322,14 @@ public class UI {
 
         int returnVal = fileChooser.showSaveDialog(null); //get user input "save" or "cancel"
 
-        if (returnVal == JFileChooser.APPROVE_OPTION)
-        { //if the user chooses "save"
-             if (!fileUtil.saveFile(fileChooser, imageManager)) {
-                 errorMessage(null, 3);
-             }
-             else {
-                 imageManager.resetNumOfEdits();
-             }
+        if (returnVal == JFileChooser.APPROVE_OPTION) { //if the user chooses "save"
+            if (!fileUtil.saveFile(fileChooser, imageManager)) {
+                errorMessage(null, 3);
+            } else {
+                imageManager.resetNumOfEdits();
+            }
         }
     }
-
 
 
     private JFileChooser makeFileChooser() {
@@ -362,8 +357,7 @@ public class UI {
     private void advanceOptions() {
         // Button "Advance Options" logic
         String anchor = getCropData();
-        if (anchor != null)
-        {
+        if (anchor != null) {
             imageManager.setCurrentImage(cropImage(anchor, imageManager.getCurrentImage()));
             imageManager.addToStack(imageManager.getImageHistory().getStack().peek().getTitle());
             imageManager.getImageHistory().addTrivia(imageManager.getImageHistory().getStack().peek().getTrivia());
@@ -399,12 +393,10 @@ public class UI {
         displayImage();
 
         txtImageTitle.setText("Traveled to: " + imageManager.getImageHistory().getStack().peek().getTitle());
-        if (imageManager.getImageHistory().getStack().peek().getTrivia() != null)
-        {
+        if (imageManager.getImageHistory().getStack().peek().getTrivia() != null) {
             txtTrivia.setText(imageManager.getImageHistory().getStack().peek().getTrivia());
             txtTrivia.setVisible(true);
-        } else
-        {
+        } else {
             txtTrivia.setVisible(false);
         }
         txtImageTitle.setVisible(true);
@@ -414,7 +406,6 @@ public class UI {
         postEditCanvas.setImage(scaleImage(imageManager.getCurrentImage(), 450, 450));
         postEditCanvas.repaint();
     }
-
 
 
     private void socketService() throws IOException {
@@ -441,11 +432,9 @@ public class UI {
 
     private void triviaService(String word) {
         String response = null;
-        try
-        {
+        try {
             response = (okHttp.sendGETSync(word, 2));
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         txtTrivia.setText(response);
@@ -455,8 +444,7 @@ public class UI {
     }
 
     private void imageFromWebService() {
-        try
-        {
+        try {
             String searchTerm = JOptionPane.showInputDialog("Enter a search term for image searching: ");
             if (searchTerm == null) //User pressed CANCEL
             {
@@ -466,8 +454,7 @@ public class UI {
             System.out.println(response);
             imageManager.setMasterImage(ImageIO.read(new URL(response)));
             displayNewImage();
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             errorMessage(ex, 2);
             imageFromWebService();
         }
@@ -475,12 +462,10 @@ public class UI {
 
     private void errorMessage(Exception ex, int type) {
         String message = "";
-        if (ex != null)
-        {
+        if (ex != null) {
             ex.printStackTrace();
         }
-        switch (type)
-        {
+        switch (type) {
             case 0:
                 message = "Please upload an image.";
                 break;
@@ -525,12 +510,10 @@ public class UI {
     }
 
     private void addStackAndTitle() {
-        try
-        {
+        try {
             String imageTitle = timePeriodService(null);
             imageManager.addToStack(imageTitle);
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -540,8 +523,7 @@ public class UI {
     }
 
     private boolean hasImage() {
-        if (imageManager.isCurrentNull())
-        {
+        if (imageManager.isCurrentNull()) {
             errorMessage(null, 0);
             return false;
         }
@@ -550,7 +532,7 @@ public class UI {
 
     private boolean isHistoryEmpty() {
         int errorCode = imageManager.getImageHistory().isStackEmpty();
-        if (errorCode == 0 || errorCode == 1 ) {
+        if (errorCode == 0 || errorCode == 1) {
             errorMessage(null, errorCode);
             return true;
         }
@@ -559,8 +541,7 @@ public class UI {
 
 
     private void actionPerformedUploadImage(ActionEvent e) {
-        if (proceedWithoutSaving())
-        {
+        if (proceedWithoutSaving()) {
             uploadImage();
         }
     }
@@ -598,15 +579,13 @@ public class UI {
     }
 
     private void actionPerformedBackPresent(ActionEvent e) {
-        if (proceedWithoutSaving() && hasImage())
-        {
+        if (proceedWithoutSaving() && hasImage()) {
             toBackPresent();
         }
     }
 
     private void actionPerformedAdvanceOptions(ActionEvent e) {
-        if (hasImage())
-        {
+        if (hasImage()) {
             advanceOptions();
         }
     }
@@ -632,8 +611,7 @@ public class UI {
     }
 
     private void actionPerformedBackToLast(ActionEvent e) {
-        if (!isHistoryEmpty())
-        {
+        if (!isHistoryEmpty()) {
             toBackToLast();
         }
     }
@@ -643,8 +621,7 @@ public class UI {
     }
 
     private void actionPerformedSelectWeb(ActionEvent e) {
-        if (proceedWithoutSaving())
-        {
+        if (proceedWithoutSaving()) {
             imageFromWebService();
         }
     }
